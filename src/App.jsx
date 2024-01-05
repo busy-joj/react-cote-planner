@@ -1,16 +1,20 @@
-import { useState } from "react";
+import React from "react";
 import { Reset } from "styled-reset";
-import crawler from "../hooks/crawler";
+import Header from "./components/Header";
+import Table from "./components/Table";
+import Contribution from "./components/Contribution";
 
-async function App() {
-  const data = await crawler;
-  console.log(data);
+const App = () => {
   return (
     <>
       <Reset />
-      <div>gd</div>
+      <Header />
+      <div className=" w-[1200px] my-0 mx-auto pt-5">
+        <Contribution />
+        <Table />
+      </div>
     </>
   );
-}
+};
 
 export default App;

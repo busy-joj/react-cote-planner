@@ -24,9 +24,6 @@ export const dummy = [
     solvedTime: "2023-07-31 05:40:49",
   },
   {
-    solvedTime: "2023-07-31 05:38:34",
-  },
-  {
     problemNum: "5427",
     problemLink: "/problem/5427",
     language: "Python 3",
