@@ -1,4 +1,4 @@
-import React from "react";
+// import React from "react";
 import { Reset } from "styled-reset";
 import Header from "./components/Header";
 import Table from "./components/Table";
