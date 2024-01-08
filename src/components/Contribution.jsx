@@ -1,108 +1,89 @@
+import {
+  eachDayOfInterval,
+  formatISO,
+  nextDay,
+  getDay,
+  parseISO,
+  subWeeks,
+  differenceInCalendarDays,
+} from "date-fns";
+import { useEffect, useState } from "react";
+
 const Contribution = () => {
+  const [activities, setActivities] = useState([]);
+
+  const weekStart = 0; // 시작은 sunday
   const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+  // 지난 52주 날짜 구하기
+  const generateDate = () => {
+    const today = new Date();
+    const days = eachDayOfInterval({
+      start: subWeeks(today, 52),
+      end: today,
+    });
+
+    return days.map((day) => formatISO(day, { representation: "date" }));
+  };
+
+  // 지난 52주 날짜 주차별 구분
+  const groupByWeeks = () => {
+    const normalizedActivities = generateDate();
+    const firstDay = parseISO(normalizedActivities[0]);
+    const firstCalendarDate =
+      getDay(firstDay) === weekStart
+        ? firstDay
+        : subWeeks(nextDay(firstDay, weekStart), 1);
+    const allActivities = [
+      ...Array(differenceInCalendarDays(firstDay, firstCalendarDate)).fill(
+        undefined
+      ),
+      ...normalizedActivities,
+    ];
+
+    const numberOfWeeks = Math.ceil(allActivities.length / 7);
+    return Array(numberOfWeeks)
+      .fill(undefined)
+      .map((_, weekIndex) =>
+        allActivities.slice(weekIndex * 7, weekIndex * 7 + 7)
+      );
+  };
+
+  useEffect(() => {
+    const weeks = groupByWeeks();
+    setActivities(weeks);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
-    <div className="relative overflow-x-auto shadow-md sm:rounded-lg py-5">
-      <table className="p-5 bg-[#79572C] text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 border-separate border-spacing-1 m-auto">
-        <caption className="p-5 text-lg font-semibold text-left rtl:text-right text-gray-900 bg-white dark:text-white dark:bg-gray-800">
-          Our products
-        </caption>
-        <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-          <tr>
-            {/* <th scope="col" className="px-6 py-3">
-              Product name
-            </th>
-            <th scope="col" className="px-6 py-3">
-              Color
-            </th>
-            <th scope="col" className="px-6 py-3">
-              Category
-            </th>
-            <th scope="col" className="px-6 py-3">
-              Price
-            </th>
-            <th scope="col" className="px-6 py-3">classclass
-              <span className="sr-only">Edit</span>
-            </th> */}
-          </tr>
-        </thead>
-        <tbody>
-          {daysOfWeek.map((value) => (
-            <tr
-              className="border-b dark:bg-gray-800 dark:border-gray-700 h-3 text-white text-xs leading-3	"
-              key={value}
-            >
-              <td>{value}</td>
-              {/* <td className="ContributionCalendar-label" style="position: relative">
-            <span className="sr-only">Monday</span>
-            <span
-              aria-hidden="true"
-              style="clip-path: None; position: absolute; bottom: -3px"
-            >
-              Fri
-            </span>
-          </td> */}
-              <td className="w-3 bg-[#BEE276] rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-[#8CB838] after:font-thin overflow-hidden"></td>
-              {/* <td className="w-3 bg-[#BEE276] rounded-tl-full rounded-br-full relative after:content-[''] after:w-3 after:h-3 after:bg-[#BEE276] after:block after:rounded-bl-full after:rounded-tr-full after:left-[-4px] after:absolute"></td> */}
-              <td className="w-3 bg-[#F0F0EF] rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-            </tr>
+    <div className="relative py-5">
+      <h2 className="font-bold mb-3 text-xl">Activities</h2>
+      <div className="grid grid-cols-[repeat(54, 1fr)] grid-flow-col-dense gap-1 m-auto shadow-md p-8 sm:rounded-lg">
+        <div className="grid w-8 text-xs leading-4 grid-rows-[repeat(7,1fr)]">
+          {daysOfWeek.map((week) => (
+            <span key={week}>{week}</span>
           ))}
-        </tbody>
-      </table>
+        </div>
+
+        {activities.map((activity, weekIndex) => (
+          <div
+            key={weekIndex}
+            className="grid grid-rows-[repeat(7,1fr)] place-content-start"
+          >
+            {activity.map((activityValue, dayIndex) => (
+              <span
+                key={dayIndex}
+                data-date={activityValue}
+                className={`w-4 h-4 inline-block ${
+                  activityValue == undefined ? "opacity-0" : "bg-[#F0F0EF]"
+                } justify-self-center rounded-tl-full rounded-br-full relative after:content-['|'] after:absolute after:left-[30%] after:rotate-[45deg] after:top-[10%] after:text-[#e3e4e2] after:font-thin overflow-hidden`}
+              >
+                {/* {activityValue} */}
+              </span>
+            ))}
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
