@@ -27,7 +27,7 @@ const Contribution = () => {
       <table className="w-full p-8 border-spacing-1 border-separate shadow-md sm:rounded-lg">
         <thead className="text-xs text-gray-700">
           <tr>
-            <th className="text-transparent text-left">요일</th>
+            <th className="text-transparent text-left opacity-0">요일</th>
             {monthLabel.map(({ weekIndex, label }) => {
               return (
                 <th
@@ -45,15 +45,19 @@ const Contribution = () => {
         <tbody>
           {dayActivity.map((activities, index) => (
             <tr key={index}>
-              <td className="text-xs w-8">{daysOfWeek[index]}</td>
+              <th className="text-xs w-8 text-left">{daysOfWeek[index]}</th>
               {activities.map((activity, index) => (
                 <td
                   key={index}
                   data-date={activity}
                   className={`w-4 h-4 ${
                     activity == undefined ? "opacity-0" : "bg-[#F0F0EF]"
-                  } justify-self-center rounded-tl-full rounded-br-full relative after:content-['|'] after:absolute after:left-[30%] after:rotate-[45deg] after:top-[10%] after:text-[#e3e4e2] after:font-thin overflow-hidden`}
-                ></td>
+                  } justify-self-center rounded-tl-full rounded-br-full relative after:content-['|'] after:absolute after:left-[30%] after:rotate-[45deg] after:top-[10%] after:text-[#e3e4e2] after:font-thin  group`}
+                >
+                  <span className="hidden rounded-md group-hover:inline-block absolute text-xs z-10 w-max px-2 py-1 origin-center translate-x-[-50%] translate-y-[-130%] ml-2 bg-slate-950 text-white cursor-default before:content-[''] before:w-2 before:h-2 before:bg-slate-950 before:inline-block before:absolute before:top-[100%] before:left-[50%] before:rotate-45 before:origin-center before:translate-x-[-50%] before:translate-y-[-50%]">
+                    {activity}
+                  </span>
+                </td>
               ))}
             </tr>
           ))}
