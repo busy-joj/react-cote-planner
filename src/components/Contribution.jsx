@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import axios from "axios";
 import { DEFAULT_MONTH_LABELS } from "@/assets/constants";
 import {
   getAllActivities,
@@ -16,11 +17,23 @@ const Contribution = () => {
   const monthLabel = getMonthLabels(datesByWeeks, DEFAULT_MONTH_LABELS);
 
   useEffect(() => {
+    const fetchData = async () => {
+      await axios
+        .get("http://localhost:8080/pet")
+        .then((res) => {
+          console.log(res.data);
+        })
+        .catch((error) => {
+          console.log("Error", error);
+        });
+    };
+    console.log(fetchData());
     const weeks = groupDatesByWeeks(allActivities);
     setDatesByWeeks(weeks);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  console.log(monthLabel);
   return (
     <div className="relative py-5">
       <h2 className="font-bold mb-3 text-xl">Activities</h2>
@@ -49,13 +62,13 @@ const Contribution = () => {
               {activities.map((activity, index) => (
                 <td
                   key={index}
-                  data-date={activity}
+                  data-date={activity?.date}
                   className={`w-4 h-4 ${
                     activity == undefined ? "opacity-0" : "bg-[#F0F0EF]"
                   } justify-self-center rounded-tl-full rounded-br-full relative after:content-['|'] after:absolute after:left-[30%] after:rotate-[45deg] after:top-[10%] after:text-[#e3e4e2] after:font-thin  group`}
                 >
                   <span className="hidden rounded-md group-hover:inline-block absolute text-xs z-10 w-max px-2 py-1 origin-center translate-x-[-50%] translate-y-[-130%] ml-2 bg-slate-950 text-white cursor-default before:content-[''] before:w-2 before:h-2 before:bg-slate-950 before:inline-block before:absolute before:top-[100%] before:left-[50%] before:rotate-45 before:origin-center before:translate-x-[-50%] before:translate-y-[-50%]">
-                    {activity}
+                    {activity?.date}
                   </span>
                 </td>
               ))}
