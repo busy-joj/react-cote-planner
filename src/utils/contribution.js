@@ -14,18 +14,29 @@ import {
 export const generateDate = () => {
   const today = new Date();
   const days = eachDayOfInterval({
-    start: subDays(today, 365),
+    start: subDays(today, 364),
     end: today,
   });
 
-  return days.map((day) => formatISO(day, { representation: "date" }));
+  return days.map((day) => {
+    const date = formatISO(day, { representation: "date" });
+    const count = 0;
+    const again = 0;
+    const level = 0;
+    return {
+      date,
+      count,
+      again,
+      level,
+    };
+  });
 };
 
 // 365일 배열 만들기
 export const getAllActivities = () => {
   const weekStart = 0; // 시작은 sunday
   const normalizedActivities = generateDate();
-  const firstDay = parseISO(normalizedActivities[0]);
+  const firstDay = parseISO(normalizedActivities[0].date);
   const firstCalendarDate =
     getDay(firstDay) === weekStart
       ? firstDay
@@ -41,7 +52,9 @@ export const getAllActivities = () => {
 
 // 지난 52주 날짜 주차별 구분
 export const groupDatesByWeeks = (array) => {
+  console.log(array);
   const numberOfWeeks = Math.ceil(array.length / 7);
+  console.log(numberOfWeeks);
   return Array(numberOfWeeks)
     .fill(undefined)
     .map((_, weekIndex) => array.slice(weekIndex * 7, weekIndex * 7 + 7));
@@ -49,26 +62,29 @@ export const groupDatesByWeeks = (array) => {
 
 // 지난 52주 날짜 요일별 구분
 export const groupByDays = (array) => {
-  const arr = [];
+  const newArr = [];
   array.map((day, index) => {
     if (day === undefined) {
-      arr[index] = Array(1).fill(undefined);
+      newArr[index] = Array(1).fill(undefined);
     } else {
-      if (arr[getDay(day)] === undefined) {
-        arr[getDay(day)] = [];
+      const { date } = day;
+      if (newArr[getDay(date)] === undefined) {
+        newArr[getDay(date)] = [];
       }
-      arr[getDay(day)].push(day);
+      newArr[getDay(date)].push(day);
     }
   });
-  return arr;
+  return newArr;
 };
 
 // 월별 위치 파악 함수
 export const getMonthLabels = (weeks, monthNames) => {
+  console.log(weeks);
   const monthLabels = weeks
     .reduce((labels, week, weekIndex) => {
       const firstActivity = week.find((activity) => activity !== undefined);
-      const month = monthNames[getMonth(firstActivity)];
+      console.log(firstActivity.date);
+      const month = monthNames[getMonth(firstActivity.date)];
       const prevLabel = labels[labels.length - 1];
       if (weekIndex === 0 || prevLabel.label !== month) {
         return [...labels, { weekIndex, label: month }];
