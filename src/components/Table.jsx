@@ -1,16 +1,17 @@
 import { useEffect, useState } from "react";
-import { dummy } from "../data/dummy";
 
-const Table = () => {
+const Table = ({ fetchSolvedProblem }) => {
   const [problemData, setProblem] = useState([]);
   useEffect(() => {
-    setProblem(dummy);
-  }, []);
+    if (fetchSolvedProblem) {
+      setProblem(Object.values(fetchSolvedProblem));
+    }
+  }, [fetchSolvedProblem]);
   return (
     <div className="relative overflow-x-auto shadow-md sm:rounded-lg py-3">
       <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
         <caption className="p-5 text-lg font-semibold text-left rtl:text-right text-gray-900 bg-white dark:text-white dark:bg-gray-800">
-          프로그래머스
+          BAEJOON
         </caption>
         <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
           <tr>
@@ -26,23 +27,27 @@ const Table = () => {
           </tr>
         </thead>
         <tbody>
-          {problemData.map((problem, index) => (
-            <tr
-              key={index}
-              className="bg-white border-b dark:bg-gray-800 dark:border-gray-700"
-            >
-              <td className="px-6 py-4">
-                <a
-                  href="#"
-                  className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
-                >
-                  {problem.problemNum}
-                </a>
-              </td>
-              <td className="px-6 py-4">{problem.language}</td>
-              <td className="px-6 py-4">{problem.solvedTime}</td>
-            </tr>
-          ))}
+          {problemData.length > 0 ? (
+            problemData.map((problem, index) => (
+              <tr
+                key={index}
+                className="bg-white border-b dark:bg-gray-800 dark:border-gray-700"
+              >
+                <td className="px-6 py-4">
+                  <a
+                    href="#"
+                    className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
+                  >
+                    {problem?.problemNum}
+                  </a>
+                </td>
+                <td className="px-6 py-4">{problem?.language}</td>
+                <td className="px-6 py-4">{problem?.solvedTime}</td>
+              </tr>
+            ))
+          ) : (
+            <tr>문제가 없습니다.</tr>
+          )}
         </tbody>
       </table>
     </div>

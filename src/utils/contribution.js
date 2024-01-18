@@ -52,9 +52,7 @@ export const getAllActivities = () => {
 
 // 지난 52주 날짜 주차별 구분
 export const groupDatesByWeeks = (array) => {
-  console.log(array);
   const numberOfWeeks = Math.ceil(array.length / 7);
-  console.log(numberOfWeeks);
   return Array(numberOfWeeks)
     .fill(undefined)
     .map((_, weekIndex) => array.slice(weekIndex * 7, weekIndex * 7 + 7));
@@ -79,11 +77,9 @@ export const groupByDays = (array) => {
 
 // 월별 위치 파악 함수
 export const getMonthLabels = (weeks, monthNames) => {
-  console.log(weeks);
   const monthLabels = weeks
     .reduce((labels, week, weekIndex) => {
       const firstActivity = week.find((activity) => activity !== undefined);
-      console.log(firstActivity.date);
       const month = monthNames[getMonth(firstActivity.date)];
       const prevLabel = labels[labels.length - 1];
       if (weekIndex === 0 || prevLabel.label !== month) {
