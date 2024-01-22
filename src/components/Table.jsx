@@ -22,7 +22,10 @@ const Table = ({ fetchSolvedProblem }) => {
               언어
             </th>
             <th scope="col" className="px-6 py-3">
-              제출한 시간
+              학습한 시간
+            </th>
+            <th scope="col" className="px-6 py-3">
+              복습한 시간
             </th>
           </tr>
         </thead>
@@ -42,11 +45,12 @@ const Table = ({ fetchSolvedProblem }) => {
                   </a>
                 </td>
                 <td className="px-6 py-4">{problem?.language}</td>
-                <td className="px-6 py-4">{problem?.solvedTime}</td>
+                <td className="px-6 py-4">{problem?.solvedTime[0]}</td>
+                <td className="px-6 py-4">{problem?.solvedTime[1]}</td>
               </tr>
             ))
           ) : (
-            <tr>문제가 없습니다.</tr>
+            <></>
           )}
         </tbody>
       </table>

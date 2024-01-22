@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { formatISO } from "date-fns";
+import { compareAsc, differenceInDays, formatISO } from "date-fns";
 import { DEFAULT_MONTH_LABELS } from "@/assets/constants";
 import {
   getAllActivities,
@@ -13,7 +13,6 @@ const Contribution = ({ fetchSolvedProblem }) => {
 
   const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
   const allActivities = getAllActivities();
-  const dayActivity = groupByDays(allActivities);
   const weeks = groupDatesByWeeks(allActivities);
   const monthLabel = getMonthLabels(weeks, DEFAULT_MONTH_LABELS);
 
@@ -23,18 +22,30 @@ const Contribution = ({ fetchSolvedProblem }) => {
         return arr; // 유효하지 않은 경우, 원래 배열 반환
       }
       for (let i = 0; i < arr.length; i++) {
-        for (let j = 0; j < arr[i].length; j++) {
-          for (let k = 0; k < arr2.length; k++) {
-            if (
-              typeof arr[i][j] === "object" &&
-              arr[i][j].hasOwnProperty("date")
-            ) {
-              const date = arr[i][j].date;
-              const solvedTime = formatISO(arr2[k].solvedTime, {
-                representation: "date",
-              });
-              if (date == solvedTime) {
-                dayActivity[i][j].count++;
+        for (let k = 0; k < arr2.length; k++) {
+          if (typeof arr[i] === "object" && arr[i].hasOwnProperty("date")) {
+            const date = arr[i].date;
+            const solvedTimeArray = arr2[k].solvedTime;
+            solvedTimeArray.sort(compareAsc);
+            const solvedTime = formatISO(arr2[k].solvedTime[0], {
+              representation: "date",
+            });
+            if (date == solvedTime) {
+              allActivities[i].count++;
+              const daysSinceProblemSolved = differenceInDays(
+                new Date(),
+                solvedTime
+              );
+              allActivities[i].overdue = daysSinceProblemSolved;
+              if (solvedTimeArray.length > 1) {
+                allActivities[i].againCount++;
+                const daysSinceAgainSolved = differenceInDays(
+                  solvedTimeArray[1],
+                  solvedTimeArray[0]
+                );
+                if (daysSinceAgainSolved < 3) {
+                  allActivities[i].again = true;
+                }
               }
             }
           }
@@ -42,7 +53,8 @@ const Contribution = ({ fetchSolvedProblem }) => {
       }
       return arr;
     };
-    setnewdayActivity(checkSolvedTime(dayActivity, fetchSolvedProblem));
+    const DataActivities = checkSolvedTime(allActivities, fetchSolvedProblem);
+    setnewdayActivity(groupByDays(DataActivities));
   }, [fetchSolvedProblem]);
 
   return (
@@ -78,13 +90,21 @@ const Contribution = ({ fetchSolvedProblem }) => {
                     className={`w-4 h-4 ${
                       activity == undefined && "opacity-0"
                     } ${
-                      activity?.count > 0
-                        ? "bg-[#EEC373] after:text-[#F4DFBA]"
-                        : "bg-[#F0F0EF] after:text-[#e3e4e2]"
+                      activity?.count == 0
+                        ? "bg-empty-full after:text-empty-line"
+                        : activity?.again && activity?.count >= 1
+                        ? `bg-good-${activity.count}-full after:text-good-${activity.count}-line`
+                        : `bg-bad-2-full after:text-bad-2-line`
                     } justify-self-center rounded-tl-full rounded-br-full relative after:content-['|'] after:absolute after:left-[30%] after:rotate-[45deg] after:top-[10%] after:font-thin  group`}
                   >
-                    <span className="hidden rounded-md group-hover:inline-block absolute text-xs z-10 w-max px-2 py-1 origin-center translate-x-[-50%] translate-y-[-130%] ml-2 bg-slate-950 text-white cursor-default before:content-[''] before:w-2 before:h-2 before:bg-slate-950 before:inline-block before:absolute before:top-[100%] before:left-[50%] before:rotate-45 before:origin-center before:translate-x-[-50%] before:translate-y-[-50%]">
+                    <span className="hidden rounded-md group-hover:inline-block absolute text-xs z-10 w-max px-2 py-1 origin-center translate-x-[-50%] translate-y-[-130%] ml-2 bg-slate-950 text-white cursor-default before:content-[''] before:w-2 before:h-2 before:bg-slate-950 before:inline-block before:absolute before:top-[100%] before:left-[50%] before:rotate-45 before:origin-center before:translate-x-[-50%] before:translate-y-[-50%] text-center">
                       You solved {activity?.count} problem on {activity?.date}
+                      <br />
+                      {activity?.count == 0
+                        ? `OMG... You didn't even solve💥`
+                        : activity?.again
+                        ? `Great!😆 You reviewed ${activity.againCount}problem✨`
+                        : `OMG... You didn't review🥲`}
                     </span>
                   </td>
                 ))}
@@ -94,15 +114,15 @@ const Contribution = ({ fetchSolvedProblem }) => {
         </table>
         <div className="flex gap-[3px] pt-3 justify-end items-center">
           <span className="text-gray-400 text-sm">Bad</span>
-          <span className="w-4 h-4 rounded-tl-full rounded-br-full bg-[#876445] inline-block"></span>
-          <span className="w-4 h-4 rounded-tl-full rounded-br-full bg-[#CA965C] inline-block"></span>
-          <span className="w-4 h-4 rounded-tl-full rounded-br-full bg-[#EEC373] inline-block"></span>
-          <span className="w-4 h-4 rounded-tl-full rounded-br-full bg-[#F4DFBA] inline-block"></span>
-          <span className="w-4 h-4 rounded-tl-full rounded-br-full bg-[#F0F0EF] inline-block"></span>
-          <span className="w-4 h-4 rounded-tl-full rounded-br-full bg-[#D0E7D2] inline-block"></span>
-          <span className="w-4 h-4 rounded-tl-full rounded-br-full bg-[#B0D9B1] inline-block"></span>
-          <span className="w-4 h-4 rounded-tl-full rounded-br-full bg-[#79AC78] inline-block"></span>
-          <span className="w-4 h-4 rounded-tl-full rounded-br-full bg-[#416241] inline-block"></span>
+          <span className="w-4 h-4 rounded-tl-full rounded-br-full bg-bad-4-full inline-block"></span>
+          <span className="w-4 h-4 rounded-tl-full rounded-br-full bg-bad-3-full inline-block"></span>
+          <span className="w-4 h-4 rounded-tl-full rounded-br-full bg-bad-2-full inline-block"></span>
+          <span className="w-4 h-4 rounded-tl-full rounded-br-full bg-bad-1-full inline-block"></span>
+          <span className="w-4 h-4 rounded-tl-full rounded-br-full bg-empty-full inline-block"></span>
+          <span className="w-4 h-4 rounded-tl-full rounded-br-full bg-good-1-full inline-block"></span>
+          <span className="w-4 h-4 rounded-tl-full rounded-br-full bg-good-2-full inline-block"></span>
+          <span className="w-4 h-4 rounded-tl-full rounded-br-full bg-good-3-full inline-block"></span>
+          <span className="w-4 h-4 rounded-tl-full rounded-br-full bg-good-4-full inline-block"></span>
           <span className="text-gray-400 text-sm">Good</span>
         </div>
       </div>
