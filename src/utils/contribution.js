@@ -21,13 +21,15 @@ export const generateDate = () => {
   return days.map((day) => {
     const date = formatISO(day, { representation: "date" });
     const count = 0;
-    const again = 0;
-    const level = 0;
+    const again = null;
+    const againCount = 0;
+    const overdue = 0;
     return {
       date,
       count,
       again,
-      level,
+      againCount,
+      overdue,
     };
   });
 };
