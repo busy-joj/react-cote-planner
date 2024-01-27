@@ -23,12 +23,16 @@ export const generateDate = () => {
     const count = 0;
     const again = null;
     const againCount = 0;
+    const level = 0;
+    const againLevel = 0;
     const overdue = 0;
     return {
       date,
       count,
       again,
       againCount,
+      level,
+      againLevel,
       overdue,
     };
   });
@@ -109,4 +113,18 @@ export const getMonthLabels = (weeks, monthNames) => {
     }
   });
   return monthLabels;
+};
+
+export const getLevel = (count) => {
+  let level;
+  if (count >= 1 && count <= 3) {
+    level = 1;
+  } else if (count >= 4 && count <= 6) {
+    level = 2;
+  } else if (count >= 7 && count <= 9) {
+    level = 3;
+  } else if (count >= 10) {
+    level = 4;
+  }
+  return level;
 };

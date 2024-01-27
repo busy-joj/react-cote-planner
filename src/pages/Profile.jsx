@@ -12,7 +12,7 @@ const ProfilePage = () => {
   useEffect(() => {
     const fetchData = async () => {
       await axios
-        .get(`http://localhost:8080/pet?id=${userState.userID}`)
+        .get(`http://localhost:8080/achievement?id=${userState.userID}`)
         .then((res) => {
           const data = res.data;
           const newData = data.reduce((acc, cur) => {
@@ -45,7 +45,7 @@ const ProfilePage = () => {
   return (
     <div className="w-[1200px] my-0 mx-auto pt-[60px]">
       <Contribution fetchSolvedProblem={fetchSolvedProblem} />
-      <Table fetchSolvedProblem={fetchSolvedProblem} />
+      <Table fetchSolvedProblem={fetchSolvedProblem} />/
     </div>
   );
 };
