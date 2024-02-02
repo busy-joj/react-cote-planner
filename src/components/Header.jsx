@@ -1,19 +1,19 @@
 // eslint-disable-next-line no-unused-vars
-import React from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import { clearUser } from "../reducer/userSlice";
+import React from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { clearUser } from '../reducer/userSlice';
 
 const Header = () => {
   const { pathname } = useLocation();
-  const userState = useSelector((state) => state.user);
+  const userState = useSelector(state => state.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const handleLogout = () => {
     dispatch(clearUser());
-    navigate("/");
+    navigate('/');
   };
-  if (pathname === "/login") return null;
+  if (pathname === '/login') return null;
   return (
     <header className="shadow-md z-50 fixed w-full">
       <nav className="bg-white border-gray-200 px-4 lg:px-6 py-2.5 dark:bg-gray-800">
@@ -24,7 +24,7 @@ const Header = () => {
             </span>
           </a>
           <div className="flex items-center lg:order-2">
-            {userState.userID !== "" ? (
+            {userState.userID !== '' ? (
               <>
                 <Link to="/profile" className="text-gray-700 pr-5">
                   마이페이지
@@ -38,14 +38,11 @@ const Header = () => {
               </>
             ) : (
               <>
-                <Link to="/login" className="text-gray-700 pr-5">
-                  로그인
-                </Link>
                 <Link
-                  to="/"
+                  to="/login"
                   className="text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-4 lg:px-5 py-2 lg:py-2.5 mr-2 dark:bg-primary-600 dark:hover:bg-primary-700 focus:outline-none dark:focus:ring-primary-800"
                 >
-                  회원가입
+                  로그인
                 </Link>
               </>
             )}
