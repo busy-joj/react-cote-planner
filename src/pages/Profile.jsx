@@ -11,7 +11,7 @@ const ProfilePage = () => {
   useEffect(() => {
     const fetchData = async () => {
       await axios
-        .get(`http://localhost:8080/achievement?id=${params.id}`)
+        .get(`${import.meta.env.VITE_SERVER_URL}achievement?id=${params.id}`)
         .then(res => {
           const data = res.data;
           const newData = data.reduce((acc, cur) => {
