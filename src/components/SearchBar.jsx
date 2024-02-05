@@ -8,7 +8,6 @@ const SearchBar = () => {
 
   const handleSubmit = e => {
     e.preventDefault();
-    console.log('gd');
     const checkID = async () => {
       await axios
         .get(
@@ -18,7 +17,6 @@ const SearchBar = () => {
         )
         .then(res => {
           const code = res.data;
-          console.log(import.meta.env.VITE_SERVER_URL);
           if (code === 404 || code === 403 || code === 401 || code === 402) {
             alert('ID를 정확히 입력하세요');
           } else if (code === 200) {
