@@ -10,12 +10,17 @@ const SearchBar = () => {
     e.preventDefault();
     const checkID = async () => {
       await axios
-        .get(`http://localhost:8080/login?userId=${searchRef.current.value}`)
+        .get(
+          `${import.meta.env.VITE_SERVER_URL}login?userId=${
+            searchRef.current.value
+          }`,
+        )
         .then(res => {
           const code = res.data;
           if (code === 404 || code === 403 || code === 401 || code === 402) {
             alert('ID를 정확히 입력하세요');
           } else if (code === 200) {
+            alert('성공');
             navigate(`/profile/${searchRef.current.value}`);
           }
         })
