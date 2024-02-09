@@ -1,8 +1,8 @@
-import axios from "axios";
-import React, { useRef } from "react";
-import { useDispatch } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
-import { loginUser } from "../reducer/userSlice";
+import axios from 'axios';
+import React, { useRef } from 'react';
+import { useDispatch } from 'react-redux';
+import { Link, useNavigate } from 'react-router-dom';
+import { loginUser } from '../reducer/userSlice';
 
 const LoginPage = () => {
   const inputID = useRef(null);
@@ -10,23 +10,27 @@ const LoginPage = () => {
   const dispatch = useDispatch();
 
   const navigate = useNavigate();
-  const handleLoginSubmit = (e) => {
+  const handleLoginSubmit = e => {
     e.preventDefault();
     const checkID = async () => {
       await axios
-        .get(`http://localhost:8080/login?userId=${inputID.current.value}`)
-        .then((res) => {
+        .get(
+          `${import.meta.env.VITE_SERVER_URL}login?userId=${
+            inputID.current.value
+          }`,
+        )
+        .then(res => {
           const code = res.data;
           if (code === 404 || code === 403 || code === 401 || code === 402) {
-            alert("ID를 정확히 입력하세요");
+            alert('ID를 정확히 입력하세요');
           } else if (code === 200) {
-            alert("로그인 성공");
+            alert('로그인 성공');
             dispatch(loginUser({ userID: inputID.current.value }));
-            navigate("/");
+            navigate('/');
           }
         })
-        .catch((error) => {
-          console.log("Error", error);
+        .catch(error => {
+          console.log('Error', error);
         });
     };
     checkID();
