@@ -4,6 +4,8 @@ import { useDispatch } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import { loginUser } from '../reducer/userSlice';
 
+import { supabaseClient } from '../supabase/client';
+
 const LoginPage = () => {
   const inputID = useRef(null);
   const inputPW = useRef(null);
@@ -12,6 +14,19 @@ const LoginPage = () => {
   const navigate = useNavigate();
   const handleLoginSubmit = e => {
     e.preventDefault();
+    // const signupHandler = async () => {
+    //   e.preventDefault();
+    //   try {
+    //     const { data, error } = await supabase.auth.signUp({
+    //       email,
+    //       password,
+    //     });
+    //     console.log(data);
+    //     if (error) console.error(error);
+    //   } catch (error) {
+    //     console.error(error);
+    //   }
+    // };
     const checkID = async () => {
       await axios
         .get(
@@ -34,6 +49,46 @@ const LoginPage = () => {
         });
     };
     checkID();
+  };
+  // const handleLogin = async e => {
+  //   e.preventDefault();
+  //   try {
+  //     const { data, error } = await supabaseClient.auth.signInWithPassword({
+  //       email: inputID.current.value,
+  //       password: inputPW.current.value,
+  //     });
+  //     if (error) console.error(error);
+  //     navigate('/');
+  //     console.log(data);
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // };
+
+  const handleLoginKakao = async e => {
+    e.preventDefault();
+    try {
+      const { data, error } = await supabaseClient.auth.signInWithOAuth({
+        provider: 'kakao',
+      });
+      setTimeout(() => {
+        if (error) console.error(error);
+        console.log(data);
+      }, 50000);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  const handleLogOut = async e => {
+    e.preventDefault();
+    try {
+      const { error } = await supabaseClient.auth.signOut();
+      if (error) console.error(error);
+      console.log('signout', error);
+      navigate('/');
+    } catch (error) {
+      console.error(error);
+    }
   };
   return (
     <section className="bg-gray-50 dark:bg-gray-900">
@@ -93,11 +148,18 @@ const LoginPage = () => {
                 </div>
               </div>
               <button
-                onClick={handleLoginSubmit}
+                onClick={handleLoginKakao}
                 type="submit"
                 className="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
               >
-                로그인
+                카카오로 로그인
+              </button>
+              <button
+                onClick={handleLogOut}
+                type="submit"
+                className="w-full text-white bg-yellow-400 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+              >
+                로그아웃
               </button>
               <p className="text-sm font-light text-gray-500 dark:text-gray-400 flex gap-6 justify-center">
                 <a
@@ -113,7 +175,7 @@ const LoginPage = () => {
                   아이디 찾기
                 </a>
                 <Link
-                  to="/SingUp"
+                  to="/signUp"
                   className="font-medium text-gray-500 hover:underline dark:text-primary-500"
                 >
                   회원가입
