@@ -1,108 +1,72 @@
-const Contribution = () => {
-  const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+import { Suspense } from 'react';
+import { DEFAULT_MONTH_LABELS } from '@/assets/constants';
+import {
+  getAllActivities,
+  getMonthLabels,
+  groupDatesByWeeks,
+} from '@/utils/contribution';
+import NewdayActivity from '@/components/NewdayActivity';
+import Skeleton from '@/components/Skeleton';
+
+const ActivityLoading = () => {
   return (
-    <div className="relative overflow-x-auto shadow-md sm:rounded-lg py-5">
-      <table className="p-5 bg-[#79572C] text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 border-separate border-spacing-1 m-auto">
-        <caption className="p-5 text-lg font-semibold text-left rtl:text-right text-gray-900 bg-white dark:text-white dark:bg-gray-800">
-          Our products
-        </caption>
-        <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-          <tr>
-            {/* <th scope="col" className="px-6 py-3">
-              Product name
-            </th>
-            <th scope="col" className="px-6 py-3">
-              Color
-            </th>
-            <th scope="col" className="px-6 py-3">
-              Category
-            </th>
-            <th scope="col" className="px-6 py-3">
-              Price
-            </th>
-            <th scope="col" className="px-6 py-3">classclass
-              <span className="sr-only">Edit</span>
-            </th> */}
-          </tr>
-        </thead>
-        <tbody>
-          {daysOfWeek.map((value) => (
-            <tr
-              className="border-b dark:bg-gray-800 dark:border-gray-700 h-3 text-white text-xs leading-3	"
-              key={value}
-            >
-              <td>{value}</td>
-              {/* <td className="ContributionCalendar-label" style="position: relative">
-            <span className="sr-only">Monday</span>
-            <span
-              aria-hidden="true"
-              style="clip-path: None; position: absolute; bottom: -3px"
-            >
-              Fri
-            </span>
-          </td> */}
-              <td className="w-3 bg-[#BEE276] rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-[#8CB838] after:font-thin overflow-hidden"></td>
-              {/* <td className="w-3 bg-[#BEE276] rounded-tl-full rounded-br-full relative after:content-[''] after:w-3 after:h-3 after:bg-[#BEE276] after:block after:rounded-bl-full after:rounded-tr-full after:left-[-4px] after:absolute"></td> */}
-              <td className="w-3 bg-[#F0F0EF] rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
-              <td className="w-3 bg-[#F0F0EF]  rounded-tl-full rounded-br-full relative after:content-['/'] after:absolute after:left-[2px] after:rotate-[20deg] after:top-[0.8px] after:text-gray-300"></td>
+    <>
+      <tr className="py-4 relative h-[136px]">
+        <td>
+          <Skeleton className="absolute w-full h-full rounded" />
+        </td>
+      </tr>
+    </>
+  );
+};
+
+const Contribution = ({ params }) => {
+  const allActivities = getAllActivities();
+  const weeks = groupDatesByWeeks(allActivities);
+  const monthLabel = getMonthLabels(weeks, DEFAULT_MONTH_LABELS);
+
+  return (
+    <div className="relative py-5">
+      <h2 className="font-bold mb-3 text-xl">Activities</h2>
+      <div className="shadow-md sm:rounded-lg p-8">
+        <table className="w-full border-spacing-1 border-separate">
+          <thead className="text-xs text-gray-700">
+            <tr>
+              <th className="text-transparent text-left opacity-0">요일</th>
+              {monthLabel.map(({ weekIndex, label }) => {
+                return (
+                  <th
+                    scope="col"
+                    colSpan={weekIndex}
+                    key={label}
+                    className="text-left"
+                  >
+                    {label}
+                  </th>
+                );
+              })}
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            <Suspense fallback={<ActivityLoading />}>
+              <NewdayActivity allActivities={allActivities} params={params} />
+            </Suspense>
+          </tbody>
+        </table>
+        <div className="flex gap-[3px] pt-3 justify-end items-center">
+          <span className="text-gray-400 text-sm">Bad</span>
+          <span className="w-4 h-4 rounded-tl-full rounded-br-full bg-bad-4-full inline-block"></span>
+          <span className="w-4 h-4 rounded-tl-full rounded-br-full bg-bad-3-full inline-block"></span>
+          <span className="w-4 h-4 rounded-tl-full rounded-br-full bg-bad-2-full inline-block"></span>
+          <span className="w-4 h-4 rounded-tl-full rounded-br-full bg-bad-1-full inline-block"></span>
+          <span className="w-4 h-4 rounded-tl-full rounded-br-full bg-empty-full inline-block"></span>
+          <span className="w-4 h-4 rounded-tl-full rounded-br-full bg-good-1-full inline-block"></span>
+          <span className="w-4 h-4 rounded-tl-full rounded-br-full bg-good-2-full inline-block"></span>
+          <span className="w-4 h-4 rounded-tl-full rounded-br-full bg-good-3-full inline-block"></span>
+          <span className="w-4 h-4 rounded-tl-full rounded-br-full bg-good-4-full inline-block"></span>
+          <span className="text-gray-400 text-sm">Good</span>
+        </div>
+      </div>
     </div>
   );
 };

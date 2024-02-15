@@ -1,9 +1,23 @@
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
+  mode: "jit",
   theme: {
     extend: {
       colors: {
+        empty: { full: "#F0F0EF", line: "#E6E6E6" },
+        good: {
+          1: { full: "#D0E7D2", line: "#B9D8BC" },
+          2: { full: "#B0D9B1", line: "#8AB989" },
+          3: { full: "#79AC78", line: "#5F975E" },
+          4: { full: "#416241", line: "#235F23" },
+        },
+        bad: {
+          1: { full: "#F4DFBA", line: "#E3CBA0" },
+          2: { full: "#EEC373", line: "#DFAA46" },
+          3: { full: "#CA965C", line: "#B27A3C" },
+          4: { full: "#876445", line: "#75563B" },
+        },
         primary: {
           50: "#eff6ff",
           100: "#dbeafe",
