@@ -71,21 +71,7 @@ const LoginPage = () => {
       const { data, error } = await supabaseClient.auth.signInWithOAuth({
         provider: 'kakao',
       });
-      setTimeout(() => {
-        if (error) console.error(error);
-        console.log(data);
-      }, 50000);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-  const handleLogOut = async e => {
-    e.preventDefault();
-    try {
-      const { error } = await supabaseClient.auth.signOut();
       if (error) console.error(error);
-      console.log('signout', error);
-      navigate('/');
     } catch (error) {
       console.error(error);
     }
@@ -150,16 +136,9 @@ const LoginPage = () => {
               <button
                 onClick={handleLoginKakao}
                 type="submit"
-                className="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+                className="w-full text-[#000000] text-opacity-85 bg-[#FEE500] focus:ring-4 focus:outline-none font-bold rounded-lg text-sm px-5 py-2.5 text-center relative after:absolute after:content-[''] after:bg-kakao-symbol after:w-6 after:h-[40px] after:bg-contain after:bg-center after:bg-no-repeat after:left-[15px] after:top-0 after:bottom-0"
               >
-                카카오로 로그인
-              </button>
-              <button
-                onClick={handleLogOut}
-                type="submit"
-                className="w-full text-white bg-yellow-400 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
-              >
-                로그아웃
+                카카오 로그인
               </button>
               <p className="text-sm font-light text-gray-500 dark:text-gray-400 flex gap-6 justify-center">
                 <a
