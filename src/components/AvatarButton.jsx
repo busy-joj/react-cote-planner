@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { userStore } from '../store/store';
+import { userStore } from '../store';
 import useOnClickOutside from '../hooks/useOnClickOutside';
 import { FaUserAlt } from 'react-icons/fa';
 import { handleLogOut } from '../utils/logout';

@@ -1,16 +1,34 @@
 // eslint-disable-next-line no-unused-vars
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
-import { userStore } from '@/store/store';
+import { userStore } from '@/store';
 
 import { GiHamburgerMenu } from 'react-icons/gi';
 import AvatarButton from './AvatarButton';
+import { supabaseClient } from '../supabase/client';
 
 const Header = () => {
   const { pathname } = useLocation();
-  const { userInfo } = userStore();
+  const { userInfo, setUserInfo } = userStore();
 
+  const [loginIsIntialized, setLoginIsIntialized] = useState(false);
+
+  useEffect(() => {
+    supabaseClient.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN' && session) {
+        const data = session.user.user_metadata;
+        setUserInfo(data);
+      } else if (event === 'SIGNED_OUT') {
+        [window.localStorage, window.sessionStorage].forEach(storage => {
+          Object.entries(storage).forEach(([key]) => {
+            storage.removeItem(key);
+          });
+        });
+      }
+      setLoginIsIntialized(true);
+    });
+  }, []);
   if (pathname === '/login') return null;
   return (
     <header className="shadow-sm z-50 fixed w-full">
@@ -21,17 +39,19 @@ const Header = () => {
               💪코테PT
             </span>
           </a>
-          <div className="flex items-center lg:order-2">
-            {userInfo.user_name ? (
-              <AvatarButton />
-            ) : (
-              <Link
-                to="/login"
-                className="text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-4 lg:px-5 py-2 lg:py-2.5 mr-2 dark:bg-primary-600 dark:hover:bg-primary-700 focus:outline-none dark:focus:ring-primary-800"
-              >
-                로그인
-              </Link>
-            )}
+          <div className="flex items-center h-8 lg:order-2">
+            {loginIsIntialized ? (
+              userInfo.user_name ? (
+                <AvatarButton />
+              ) : (
+                <Link
+                  to="/login"
+                  className="text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-4 lg:px-5 py-[6px] lg:py-2.5 dark:bg-primary-600 dark:hover:bg-primary-700 focus:outline-none dark:focus:ring-primary-800"
+                >
+                  로그인
+                </Link>
+              )
+            ) : null}
 
             <button
               type="button"
