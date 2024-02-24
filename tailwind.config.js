@@ -31,6 +31,10 @@ export default {
           900: '#1e3a8a',
           950: '#172554',
         },
+        profileCard: {
+          study: '#78A0AC',
+          review: '#79AC78',
+        },
       },
     },
     backgroundImage: {
