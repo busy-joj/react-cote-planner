@@ -1,136 +1,246 @@
-import React, { useRef } from 'react';
+import React, { useState } from 'react';
+import axios from 'axios';
+import { useForm } from 'react-hook-form';
+import { Link, useNavigate } from 'react-router-dom';
 
 import { supabaseClient } from '../supabase/client';
 
+import SignLayout from '../components/SignLayout';
+import Spinner from '../components/Spinner';
+import ValidateMessage from '../components/ValidateMessage';
+
 const SignUpPage = () => {
-  const inputID = useRef(null);
-  const inputPW = useRef(null);
-  const HandleSignUp = async e => {
-    console.log(inputID.current.value, inputPW.current.value);
+  const navigate = useNavigate();
+  const [baekjoonValidation, setBaekjoonValidation] = useState({
+    isLoading: false,
+    checked: false,
+    text: 'Check',
+  });
+  const {
+    register,
+    formState: { errors },
+    getValues,
+    handleSubmit,
+  } = useForm({ mode: 'onChange' });
+  const onSubmit = data => {
+    if (!baekjoonValidation.checked) {
+      inputBaekjoonID.current.focus();
+      return;
+    }
+    HandleSignUp(data);
+  };
+
+  const handleBaekjoonValidation = async e => {
     e.preventDefault();
+    const baekjoonID = getValues('baekjoonID');
+    setBaekjoonValidation({
+      ...baekjoonValidation,
+      isLoading: true,
+    });
+    await axios
+      .get(`${import.meta.env.VITE_SERVER_URL}login?userId=${baekjoonID}`)
+      .then(res => {
+        const code = res.data;
+        console.log(code);
+        if (code === 404 || code === 403 || code === 401 || code === 402) {
+          setBaekjoonValidation({
+            ...baekjoonValidation,
+            text: 'Failed',
+            checked: false,
+          });
+        } else if (code === 200) {
+          setBaekjoonValidation({
+            ...baekjoonValidation,
+            text: 'Checked',
+            checked: true,
+          });
+        }
+      })
+      .catch(error => {
+        console.log('Error', error);
+      });
+  };
+
+  const HandleSignUp = async inputData => {
+    const { email, pw, username, BaekjoonID } = inputData;
     try {
       const { data, error } = await supabaseClient.auth.signUp({
-        email: inputID.current.value,
-        password: inputPW.current.value,
+        email: email,
+        password: pw,
         options: {
-          emailRedirectTo: 'https://cote-pt.vercel.app/login',
+          data: {
+            user_name: username,
+            avatar_url: null,
+            BaekjoonID: BaekjoonID,
+          },
         },
       });
       if (error) console.error(error);
-      console.log(data);
+      navigate('/signup/confirm');
     } catch (error) {
       console.error(error);
     }
   };
   return (
-    <section className="bg-gray-50 dark:bg-gray-900">
-      <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
-        {/* <a href="#" className="flex items-center mb-6 text-2xl font-semibold text-gray-900 dark:text-white">
-          <img className="w-8 h-8 mr-2" src="https://flowbite.s3.amazonaws.com/blocks/marketing-ui/logo.svg" alt="logo">
-          Flowbite    
-      </a> */}
-        <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
-          <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
-            <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
-              Create and account
-            </h1>
-            <form className="space-y-4 md:space-y-6" action="#">
-              <div>
-                <label
-                  htmlFor="email"
-                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                >
-                  Your email
-                </label>
-                <input
-                  ref={inputID}
-                  type="email"
-                  name="email"
-                  id="email"
-                  className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                  placeholder="name@company.com"
-                  required=""
-                />
-              </div>
-              <div>
-                <label
-                  htmlFor="password"
-                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                >
-                  Password
-                </label>
-                <input
-                  ref={inputPW}
-                  type="password"
-                  name="password"
-                  id="password"
-                  placeholder="••••••••"
-                  className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                  required=""
-                />
-              </div>
-              <div>
-                <label
-                  htmlFor="confirm-password"
-                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                >
-                  Confirm password
-                </label>
-                <input
-                  type="confirm-password"
-                  name="confirm-password"
-                  id="confirm-password"
-                  placeholder="••••••••"
-                  className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                  required=""
-                />
-              </div>
-              <div className="flex items-start">
-                <div className="flex items-center h-5">
-                  <input
-                    id="terms"
-                    aria-describedby="terms"
-                    type="checkbox"
-                    className="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-primary-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-primary-600 dark:ring-offset-gray-800"
-                    required=""
-                  />
-                </div>
-                <div className="ml-3 text-sm">
-                  <label
-                    htmlFor="terms"
-                    className="font-light text-gray-500 dark:text-gray-300"
-                  >
-                    I accept the{' '}
-                    <a
-                      className="font-medium text-primary-600 hover:underline dark:text-primary-500"
-                      href="#"
-                    >
-                      Terms and Conditions
-                    </a>
-                  </label>
-                </div>
-              </div>
-              <button
-                onClick={HandleSignUp}
-                type="submit"
-                className="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
-              >
-                Create an account
-              </button>
-              <p className="text-sm font-light text-gray-500 dark:text-gray-400">
-                Already have an account?{' '}
-                <a
-                  href="#"
-                  className="font-medium text-primary-600 hover:underline dark:text-primary-500"
-                >
-                  Login here
-                </a>
-              </p>
-            </form>
-          </div>
+    <SignLayout>
+      <form
+        className="space-y-4 md:space-y-6"
+        onSubmit={handleSubmit(onSubmit)}
+      >
+        <div>
+          <label
+            htmlFor="email"
+            className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+          >
+            이메일
+          </label>
+          <input
+            type="email"
+            name="email"
+            id="email"
+            {...register('email', {
+              required: '이메일을 입력하세요',
+              pattern: {
+                value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                message: '이메일 형식으로 작성하세요',
+              },
+            })}
+            className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            placeholder="name@company.com"
+          />
+          {errors.email && (
+            <ValidateMessage>{errors.email.message}</ValidateMessage>
+          )}
         </div>
-      </div>
-    </section>
+        <div>
+          <label
+            htmlFor="username"
+            className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+          >
+            이름
+          </label>
+          <input
+            type="text"
+            name="username"
+            id="username"
+            {...register('username', {
+              required: '이름을 입력하세요',
+              maxLength: 20,
+            })}
+            className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            placeholder="이름을 입력하세요"
+          />
+          {errors.username && (
+            <ValidateMessage>{errors.username.message}</ValidateMessage>
+          )}
+        </div>
+        <div>
+          <label
+            htmlFor="username"
+            className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+          >
+            Baekjoon ID
+          </label>
+          <div className="flex gap-2">
+            <input
+              type="text"
+              name="baekjoonID"
+              id="baekjoonID"
+              {...register('baekjoonID', {
+                required: 'baekjoonID를 입력하세요',
+                validate: value =>
+                  value !== null && baekjoonValidation.checked
+                    ? true
+                    : 'baekjoonID를 확인하세요',
+              })}
+              className="bg-gray-50 border flex-grow-0 border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              placeholder="Baekjoon 아이디를 입력하세요"
+              required=""
+            />
+            <button
+              onClick={handleBaekjoonValidation}
+              className="flex-shrink-0 text-white w-1/5 bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800 flex justify-center items-center"
+            >
+              {baekjoonValidation.isLoading ? (
+                <Spinner className="w-4 h-4" />
+              ) : (
+                `${baekjoonValidation.text}`
+              )}
+            </button>
+          </div>
+          {!baekjoonValidation.checked && errors.baekjoonID && (
+            <ValidateMessage>{errors.baekjoonID.message}</ValidateMessage>
+          )}
+        </div>
+        <div>
+          <label
+            htmlFor="password"
+            className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+          >
+            비밀번호
+          </label>
+          <input
+            type="password"
+            name="password"
+            id="password"
+            placeholder="••••••••••"
+            {...register('pw', {
+              required: '비밀번호를 입력하세요',
+              pattern: {
+                value: /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[#?!@$%^&*-]).{8,}$/,
+                message:
+                  '비밀번호는 8자 이상, 대문자/소문자/특수문자 모두 포함되어야 합니다.',
+              },
+            })}
+            className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+          />
+          {errors.pw && <ValidateMessage>{errors.pw.message}</ValidateMessage>}
+        </div>
+        <div>
+          <label
+            htmlFor="confirm-password"
+            className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+          >
+            비밀번호 확인
+          </label>
+          <input
+            type="password"
+            name="confirm-password"
+            id="confirm-password"
+            placeholder="••••••••••"
+            {...register('confirmPw', {
+              require: '비밀번호를 확인하세요',
+              validate: {
+                matchPassword: value => {
+                  const { pw } = getValues();
+                  return pw === value || '비밀번호가 일치하지 않습니다';
+                },
+              },
+            })}
+            className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            required=""
+          />
+          {errors.confirmPw && (
+            <ValidateMessage>{errors.confirmPw.message}</ValidateMessage>
+          )}
+        </div>
+        <button
+          type="submit"
+          className="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+        >
+          Create an account
+        </button>
+        <p className="text-sm font-light text-gray-500 dark:text-gray-400">
+          Already have an account?{' '}
+          <Link
+            to="/login"
+            className="font-medium text-primary-600 hover:underline dark:text-primary-500"
+          >
+            Login here
+          </Link>
+        </p>
+      </form>
+    </SignLayout>
   );
 };
 

@@ -29,7 +29,7 @@ const Header = () => {
       setLoginIsIntialized(true);
     });
   }, []);
-  if (pathname === '/login') return null;
+  if (pathname === '/login' || pathname === '/signup') return null;
   return (
     <header className="shadow-sm z-50 fixed w-full">
       <nav className="bg-white border-gray-200 px-4 lg:px-6 py-2.5 dark:bg-gray-800">
