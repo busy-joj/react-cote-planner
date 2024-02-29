@@ -1,5 +1,5 @@
-import React, { useRef, useState } from 'react';
-import axios from 'axios';
+import React, { useState, useRef } from 'react';
+import { defaultInstance } from '@/apis';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
 
@@ -10,6 +10,7 @@ import Spinner from '../components/common/Spinner';
 import ValidateMessage from '../components/common/ValidateMessage';
 import Button, { SubmitButton } from '../components/common/Button';
 import Input, { LabelInput, Label } from '../components/common/Input';
+import { useQuery } from '@tanstack/react-query';
 
 const SignUpPage = () => {
   const navigate = useNavigate();
@@ -19,6 +20,17 @@ const SignUpPage = () => {
     checked: false,
     text: '인증',
   });
+
+  const [baekjoonID, setBaekjoonID] = useState('');
+  const { refetch } = useQuery({
+    queryKey: ['userCheck', baekjoonID],
+    queryFn: () =>
+      defaultInstance
+        .get(`login?userId=${baekjoonID}`)
+        .then(({ data }) => data),
+    enabled: false,
+  });
+
   const {
     register,
     formState: { errors },
@@ -52,33 +64,26 @@ const SignUpPage = () => {
 
   const handleBaekjoonValidation = async e => {
     e.preventDefault();
-    const baekjoonID = getValues('baekjoonID');
-    checkChangeRef.current = baekjoonID;
     setBaekjoonValidation({
       ...baekjoonValidation,
       isLoading: true,
     });
-    await axios
-      .get(`${import.meta.env.VITE_SERVER_URL}login?userId=${baekjoonID}`)
-      .then(res => {
-        const code = res.data;
-        if (code === 404 || code === 403 || code === 401 || code === 402) {
-          setBaekjoonValidation({
-            ...baekjoonValidation,
-            text: '실패',
-            checked: false,
-          });
-        } else if (code === 200) {
-          setBaekjoonValidation({
-            ...baekjoonValidation,
-            text: '성공',
-            checked: true,
-          });
-        }
-      })
-      .catch(error => {
-        console.log('Error', error);
+    const { data: code, isLoading } = await refetch();
+    if (code === 404 || code === 403 || code === 401 || code === 402) {
+      setBaekjoonValidation({
+        ...baekjoonValidation,
+        text: '실패',
+        checked: false,
+        isLoading,
       });
+    } else if (code === 200) {
+      setBaekjoonValidation({
+        ...baekjoonValidation,
+        text: '성공',
+        checked: true,
+        isLoading,
+      });
+    }
   };
 
   const HandleSignUp = async inputData => {
@@ -154,6 +159,7 @@ const SignUpPage = () => {
               placeholder="BaekjoonID를 입력하세요"
               {...register('baekjoonID', {
                 required: 'baekjoonID를 입력해주세요',
+                onChange: e => setBaekjoonID(e.target.value),
                 validate: value =>
                   value !== null && baekjoonValidation.checked
                     ? true
