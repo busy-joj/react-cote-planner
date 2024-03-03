@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
 import { groupByDays, getLevel } from '@/utils/contribution';
 import useGetData from '@/hooks/useGetData';
+import { defaultInstance } from '@/apis';
 import { getBackjoonSolvedData } from '@/apis/crawling/backjoon';
 import { compareAsc, differenceInDays, formatISO } from 'date-fns';
+import { useSuspenseQuery } from '@tanstack/react-query';
 
 const activityBgColor = {
   good: {
@@ -25,11 +27,13 @@ const NewdayActivity = props => {
   const { allActivities, params } = props;
   const [newdayActivity, setnewdayActivity] = useState([]);
   const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-  const fetchSolvedProblem = useGetData(
-    `achievement?id=${params.id}`,
-    getBackjoonSolvedData,
-  );
-
+  const { data: fetchSolvedProblem } = useSuspenseQuery({
+    queryKey: ['solved', params.id],
+    queryFn: () =>
+      defaultInstance
+        .get(`achievement?id=${params.id}`)
+        .then(res => getBackjoonSolvedData(res.data)),
+  });
   useEffect(() => {
     const checkSolvedTime = (arr, arr2) => {
       if (!Array.isArray(arr) || !Array.isArray(arr2)) {
