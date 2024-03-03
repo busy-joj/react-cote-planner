@@ -1,33 +1,46 @@
 import React, { useRef } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
+import fetchUserCheck from '@/apis/fetchUserCheck';
 
 import { IoSearch } from 'react-icons/io5';
 
 const SearchBar = () => {
   const searchRef = useRef(null);
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const handleSubmit = e => {
     e.preventDefault();
     const checkID = async () => {
-      await axios
-        .get(
-          `${import.meta.env.VITE_SERVER_URL}login?userId=${
-            searchRef.current.value
-          }`,
-        )
-        .then(res => {
-          const code = res.data;
-          if (code === 404 || code === 403 || code === 401 || code === 402) {
-            alert('ID를 정확히 입력하세요');
-          } else if (code === 200) {
-            navigate(`/profile/${searchRef.current.value}`);
-          }
-        })
-        .catch(error => {
-          console.log('Error', error);
-        });
+      const code = await queryClient.fetchQuery({
+        queryKey: ['userCheck', searchRef.current.value],
+        queryFn: () => fetchUserCheck(searchRef.current.value),
+      });
+
+      if (code === 404 || code === 403 || code === 401 || code === 402) {
+        alert('ID를 정확히 입력하세요');
+      } else if (code === 200) {
+        navigate(`/profile/${searchRef.current.value}`);
+      }
+      // await axios
+      //   .get(
+      //     `${import.meta.env.VITE_SERVER_URL}login?userId=${
+      //       searchRef.current.value
+      //     }`,
+      //   )
+      //   .then(res => {
+      //     const code = res.data;
+      //     if (code === 404 || code === 403 || code === 401 || code === 402) {
+      //       alert('ID를 정확히 입력하세요');
+      //     } else if (code === 200) {
+      //       navigate(`/profile/${searchRef.current.value}`);
+      //     }
+      //   })
+      //   .catch(error => {
+      //     console.log('Error', error);
+      //   });
     };
     checkID();
   };

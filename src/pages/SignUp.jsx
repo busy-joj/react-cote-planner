@@ -1,5 +1,4 @@
 import React, { useState, useRef } from 'react';
-import { defaultInstance } from '@/apis';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
 
@@ -10,7 +9,8 @@ import Spinner from '../components/common/Spinner';
 import ValidateMessage from '../components/common/ValidateMessage';
 import Button, { SubmitButton } from '../components/common/Button';
 import Input, { LabelInput, Label } from '../components/common/Input';
-import { useQuery } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
+import fetchUserCheck from '@/apis/fetchUserCheck';
 
 const SignUpPage = () => {
   const navigate = useNavigate();
@@ -22,14 +22,7 @@ const SignUpPage = () => {
   });
 
   const [baekjoonID, setBaekjoonID] = useState('');
-  const { refetch } = useQuery({
-    queryKey: ['userCheck', baekjoonID],
-    queryFn: () =>
-      defaultInstance
-        .get(`login?userId=${baekjoonID}`)
-        .then(({ data }) => data),
-    enabled: false,
-  });
+  const queryClient = useQueryClient();
 
   const {
     register,
@@ -68,20 +61,23 @@ const SignUpPage = () => {
       ...baekjoonValidation,
       isLoading: true,
     });
-    const { data: code, isLoading } = await refetch();
+    const code = await queryClient.fetchQuery({
+      queryKey: ['userCheck', baekjoonID],
+      queryFn: () => fetchUserCheck(baekjoonID),
+    });
     if (code === 404 || code === 403 || code === 401 || code === 402) {
       setBaekjoonValidation({
         ...baekjoonValidation,
         text: '실패',
         checked: false,
-        isLoading,
+        isLoading: false,
       });
     } else if (code === 200) {
       setBaekjoonValidation({
         ...baekjoonValidation,
         text: '성공',
         checked: true,
-        isLoading,
+        isLoading: false,
       });
     }
   };
