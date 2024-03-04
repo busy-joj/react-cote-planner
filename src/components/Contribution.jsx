@@ -26,7 +26,7 @@ const Contribution = ({ params }) => {
   const monthLabel = getMonthLabels(weeks, DEFAULT_MONTH_LABELS);
 
   return (
-    <div className="relative py-5">
+    <div className="relative py-8">
       <h2 className="font-bold mb-3 text-xl">Activities</h2>
       <div className="shadow-md sm:rounded-lg p-8">
         <table className="w-full border-spacing-1 border-separate">
