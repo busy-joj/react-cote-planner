@@ -1,24 +1,72 @@
 // eslint-disable-next-line no-unused-vars
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
 import { userStore } from '@/store';
-
+import { defaultInstance } from '@/apis';
+import { getBackjoonSolvedData } from '@/apis/crawling/backjoon';
 import { GiHamburgerMenu } from 'react-icons/gi';
 import AvatarButton from './AvatarButton';
 import { supabaseClient } from '../supabase/client';
+import { useQueryClient } from '@tanstack/react-query';
 
 const Header = () => {
   const { pathname } = useLocation();
   const { userInfo, setUserInfo } = userStore();
+  const baekjoonData = useRef();
+  const queryClient = useQueryClient();
 
   const [loginIsIntialized, setLoginIsIntialized] = useState(false);
 
   useEffect(() => {
+    let timeoutId;
     supabaseClient.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN' && session) {
         const data = session.user.user_metadata;
         setUserInfo(data);
+        if (!baekjoonData.current) {
+          // setTimeout으로 한 이유는 onAuthStateChange와 데드락을 피하기 위해 사용
+          timeoutId = setTimeout(async () => {
+            let { data: baekjoon, error } = await supabaseClient
+              .from('baekjoon')
+              .select('solved_recent')
+              .eq('id', session.user.user_metadata.baekjoon_id);
+            baekjoonData.current = baekjoon[0].solved_recent;
+            // baekjoon 테이블에 있는 solved_recent 컬럼을 조회 후 없으면 크롤링
+            // session에 baekjoon_id가 존재해야함
+            if (
+              session.user.user_metadata.baekjoon_id &&
+              !baekjoon[0].solved_recent
+            ) {
+              const crawling = await queryClient.fetchQuery({
+                queryKey: ['solved', session.user.user_metadata.baekjoon_id],
+                queryFn: () =>
+                  defaultInstance
+                    .get(
+                      `achievement?id=${session.user.user_metadata.baekjoon_id}`,
+                    )
+                    .then(res => {
+                      return {
+                        ...res.data,
+                        solved_problem: getBackjoonSolvedData(
+                          res.data.solved_problem,
+                        ),
+                      };
+                    }),
+              });
+              // 크롤링한 데이터를 가지고 baekjoon 테이블 업데이트
+              const { data: updateData, error } = await supabaseClient
+                .from('baekjoon')
+                .update({
+                  solved_problem: crawling.solved_problem,
+                  solved_count: crawling.solved_count,
+                  solved_recent: crawling.solved_recent,
+                })
+                .eq('id', session.user.user_metadata.baekjoon_id)
+                .select();
+            }
+          }, 0);
+        }
       } else if (event === 'SIGNED_OUT') {
         [window.localStorage, window.sessionStorage].forEach(storage => {
           Object.entries(storage).forEach(([key]) => {
@@ -28,6 +76,7 @@ const Header = () => {
       }
       setLoginIsIntialized(true);
     });
+    return () => clearTimeout(timeoutId);
   }, []);
   if (pathname === '/login' || pathname === '/signup') return null;
   return (
