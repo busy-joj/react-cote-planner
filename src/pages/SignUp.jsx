@@ -21,7 +21,6 @@ const SignUpPage = () => {
     text: '인증',
   });
 
-  const [baekjoonID, setBaekjoonID] = useState('');
   const queryClient = useQueryClient();
 
   const {
@@ -57,6 +56,9 @@ const SignUpPage = () => {
 
   const handleBaekjoonValidation = async e => {
     e.preventDefault();
+    const baekjoonID = getValues('baekjoonID');
+    checkChangeRef.current = baekjoonID;
+
     setBaekjoonValidation({
       ...baekjoonValidation,
       isLoading: true,
@@ -83,7 +85,7 @@ const SignUpPage = () => {
   };
 
   const HandleSignUp = async inputData => {
-    const { email, pw, username, BaekjoonID } = inputData;
+    const { email, pw, username, baekjoonID } = inputData;
     try {
       const { data, error } = await supabaseClient.auth.signUp({
         email: email,
@@ -92,7 +94,7 @@ const SignUpPage = () => {
           data: {
             user_name: username,
             avatar_url: null,
-            BaekjoonID: BaekjoonID,
+            baekjoon_id: baekjoonID,
           },
         },
       });
@@ -155,7 +157,6 @@ const SignUpPage = () => {
               placeholder="BaekjoonID를 입력하세요"
               {...register('baekjoonID', {
                 required: 'baekjoonID를 입력해주세요',
-                onChange: e => setBaekjoonID(e.target.value),
                 validate: value =>
                   value !== null && baekjoonValidation.checked
                     ? true
@@ -194,9 +195,9 @@ const SignUpPage = () => {
                 },
                 checkInclude: value => {
                   const reg = '^(?=.*[@$!%*#?&]).{1,}$';
-                  return (
-                    value.match(reg) || '하나 이상의 특수문자가 포함되어야 해요'
-                  );
+                  return value.match(reg)
+                    ? true
+                    : '하나 이상의 특수문자가 포함되어야 해요';
                 },
               },
             })}
