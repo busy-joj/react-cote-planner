@@ -5,6 +5,8 @@ import { defaultInstance } from '@/apis';
 import { getBackjoonSolvedData } from '@/apis/crawling/backjoon';
 import { compareAsc, differenceInDays, formatISO } from 'date-fns';
 import { useSuspenseQuery } from '@tanstack/react-query';
+import { supabaseClient } from '../supabase/client';
+import { isOneDayPassed } from '../utils/contribution';
 
 const activityBgColor = {
   good: {
@@ -27,14 +29,47 @@ const NewdayActivity = props => {
   const { allActivities, params } = props;
   const [newdayActivity, setnewdayActivity] = useState([]);
   const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-  const { data: fetchSolvedProblem } = useSuspenseQuery({
+  const { data: query } = useSuspenseQuery({
     queryKey: ['solved', params.id],
-    queryFn: () =>
-      defaultInstance
-        .get(`achievement?id=${params.id}`)
-        .then(res => getBackjoonSolvedData(res.data)),
+    queryFn: async () =>
+      await supabaseClient.from('baekjoon').select('*').eq('id', params.id),
   });
+  const data = query.data?.at(0);
+  const fetchSolvedProblem = data.solved_problem;
+  const fetchSolvedCount = data.solved_count;
+  const fetchSolvedRecent = data.solved_recent;
   useEffect(() => {
+    // 하루 이상 지나면 데이터 업데이트
+    if (isOneDayPassed(data.updated_at)) {
+      (async () => {
+        const crawlingData = await defaultInstance
+          .get(`achievement?id=${params.id}`)
+          .then(res => {
+            return {
+              ...res.data,
+              solved_problem: getBackjoonSolvedData(res.data.solved_problem),
+            };
+          });
+
+        if (
+          data.id &&
+          (!fetchSolvedRecent ||
+            fetchSolvedRecent != crawlingData.solved_recent)
+        ) {
+          const { data, error } = await supabase
+            .from('baekjoon')
+            .insert([
+              {
+                solved_problem: crawlingData.solved_problem,
+                solved_count: crawlingData.solved_count,
+                solved_recent: crawlingData.solved_recent,
+              },
+            ])
+            .select();
+          console.log('업데이트', data);
+        }
+      })();
+    }
     const checkSolvedTime = (arr, arr2) => {
       if (!Array.isArray(arr) || !Array.isArray(arr2)) {
         return arr; // 유효하지 않은 경우, 원래 배열 반환
