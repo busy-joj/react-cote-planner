@@ -15,6 +15,7 @@ import fetchUserCheck from '@/apis/fetchUserCheck';
 const SignUpPage = () => {
   const navigate = useNavigate();
   const checkChangeRef = useRef(null);
+  const [isLoadingSignup, setIsLoadingSignup] = useState(false);
   const [baekjoonValidation, setBaekjoonValidation] = useState({
     isLoading: false,
     checked: false,
@@ -86,6 +87,7 @@ const SignUpPage = () => {
 
   const HandleSignUp = async inputData => {
     const { email, pw, username, baekjoonID } = inputData;
+    setIsLoadingSignup(true);
     try {
       const { data, error } = await supabaseClient.auth.signUp({
         email: email,
@@ -98,8 +100,11 @@ const SignUpPage = () => {
           },
         },
       });
-      if (error) console.error(error);
-      navigate('/signup/confirm');
+      if (error) {
+        console.error(error);
+      } else {
+        navigate('/signup/confirm');
+      }
     } catch (error) {
       console.error(error);
     }
@@ -118,6 +123,19 @@ const SignUpPage = () => {
             placeholder="name@company.com"
             {...register('email', {
               required: '이메일을 입력해주세요',
+              onBlur: async e => {
+                const { data: profiles, error } = await supabaseClient
+                  .from('profiles')
+                  .select('email')
+                  .eq('email', e.target.value);
+                return (
+                  profiles.length > 0 &&
+                  setError('email', {
+                    type: 'emailCheckDuplication',
+                    message: '이미 가입된 이메일 입니다.',
+                  })
+                );
+              },
               pattern: {
                 value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
                 message: '이메일 형식으로 작성해주실래요?',
@@ -231,7 +249,7 @@ const SignUpPage = () => {
           )}
         </div>
         <SubmitButton className="w-full text-white bg-primary-600 hover:bg-primary-700">
-          회원가입
+          {!isLoadingSignup ? '회원가입' : <Spinner className="w-4 h-4" />}
         </SubmitButton>
         <p className="text-sm font-light text-gray-500 dark:text-gray-400">
           이미 회원이신가요?{' '}

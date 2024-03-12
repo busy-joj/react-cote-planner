@@ -96,11 +96,14 @@ const NewdayActivity = props => {
                   solvedTimeArray[0],
                 );
               }
-              if (allActivities[i].againCount == allActivities[i].count) {
-                allActivities[i].again = true;
-              }
             }
           }
+        }
+        if (
+          allActivities[i] &&
+          allActivities[i].againCount === allActivities[i].count
+        ) {
+          allActivities[i].again = true;
         }
       }
       return arr;
