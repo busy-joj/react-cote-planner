@@ -40,7 +40,6 @@ const LoginPage = () => {
       return;
     }
   };
-
   const handleLoginKakao = async e => {
     e.preventDefault();
     try {
@@ -113,16 +112,10 @@ const LoginPage = () => {
         </div>
         <div className="text-sm font-light text-gray-500 dark:text-gray-400 flex gap-6 justify-center">
           <Link
-            href="#"
+            to="/login/check"
             className="text-sm font-medium text-gray-500 hover:underline dark:text-primary-500 relative after:content-['|'] after:absolute after:top-[-1.5px] after:right-[-14px]"
           >
             비밀번호 찾기
-          </Link>
-          <Link
-            href="#"
-            className="text-sm font-medium text-gray-500 hover:underline dark:text-primary-500 relative after:content-['|'] after:absolute after:top-[-1.5px] after:right-[-14px]"
-          >
-            아이디 찾기
           </Link>
           <Link
             to="/signup"

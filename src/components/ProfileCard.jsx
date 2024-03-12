@@ -6,7 +6,9 @@ import DonutChart from './DonutChart';
 const ProfileCard = () => {
   const { userInfo } = userStore();
   const params = useParams();
-
+  if (userInfo == null) {
+    return;
+  }
   return (
     <section className="flex justify-between py-8">
       <article className="w-1/3">

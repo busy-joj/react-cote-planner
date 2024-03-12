@@ -29,6 +29,7 @@ const Header = () => {
       setLoginIsIntialized(true);
     });
   }, []);
+
   if (pathname === '/login' || pathname === '/signup') return null;
   return (
     <header className="shadow-sm z-50 fixed w-full">
@@ -41,7 +42,7 @@ const Header = () => {
           </a>
           <div className="flex items-center h-8 lg:order-2">
             {loginIsIntialized ? (
-              userInfo.user_name ? (
+              userInfo?.user_name ? (
                 <AvatarButton />
               ) : (
                 <Link
