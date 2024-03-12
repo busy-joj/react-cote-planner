@@ -3,11 +3,13 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import fetchUserCheck from '@/apis/fetchUserCheck';
-
+import fetchAchievement from '@/apis/fetchAchievement';
 import { IoSearch } from 'react-icons/io5';
+import { userStore } from '@/store';
 
 const SearchBar = () => {
   const searchRef = useRef(null);
+  const { userInfo } = userStore();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
@@ -19,28 +21,18 @@ const SearchBar = () => {
         queryFn: () => fetchUserCheck(searchRef.current.value),
       });
 
+      if (userInfo.baekjoon_id !== searchRef.current.value) {
+        queryClient.prefetchQuery({
+          queryKey: ['solved', searchRef.current.value],
+          queryFn: () => fetchAchievement(searchRef.current.value),
+        });
+      }
+
       if (code === 404 || code === 403 || code === 401 || code === 402) {
         alert('ID를 정확히 입력하세요');
       } else if (code === 200) {
         navigate(`/profile/${searchRef.current.value}`);
       }
-      // await axios
-      //   .get(
-      //     `${import.meta.env.VITE_SERVER_URL}login?userId=${
-      //       searchRef.current.value
-      //     }`,
-      //   )
-      //   .then(res => {
-      //     const code = res.data;
-      //     if (code === 404 || code === 403 || code === 401 || code === 402) {
-      //       alert('ID를 정확히 입력하세요');
-      //     } else if (code === 200) {
-      //       navigate(`/profile/${searchRef.current.value}`);
-      //     }
-      //   })
-      //   .catch(error => {
-      //     console.log('Error', error);
-      //   });
     };
     checkID();
   };
