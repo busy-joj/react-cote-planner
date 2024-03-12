@@ -15,6 +15,7 @@ const Input = forwardRef(
           className,
         )}
         placeholder={placeholder}
+        autoComplete="on"
       />
     );
   },
@@ -52,6 +53,7 @@ export const LabelInput = forwardRef(
             className,
           )}
           placeholder={placeholder}
+          autoComplete="on"
         />
       </>
     );
