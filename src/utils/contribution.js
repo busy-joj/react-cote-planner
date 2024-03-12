@@ -149,7 +149,8 @@ export const fromNow = date => {
   if (!date) {
     return null;
   }
-  const d = new Date(date);
+  const setDate = new Date(date);
+  const d = new Date(setDate.getTime() - 9 * 60 * 60 * 1000); // 9시간 빼기
   const now = Date.now();
   const diff = (now - d.getTime()) / 1000; // 현재 시간과의 차이(초)
   if (diff < 60 * 1) {
