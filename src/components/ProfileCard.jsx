@@ -8,6 +8,7 @@ import { supabaseClient } from '../supabase/client';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import Refresh from '@/assets/refresh.svg?react';
 import Spinner from './common/Spinner';
+import { fromNow } from '@/utils/contribution';
 
 const ProfileCard = () => {
   const { userInfo } = userStore();
@@ -40,12 +41,9 @@ const ProfileCard = () => {
         </picture>
         <div className="">
           <h1 className="font-bold text-3xl mb-3">
-            {userInfo.user_name ?? 'Guest'}
+            {params.id || userInfo.user_name}
           </h1>
           <div className="flex items-center gap-2 mb-4">
-            <p className="text-gray-500 text-base">
-              {params.id || userInfo.user_name}
-            </p>
             <LoadingButton
               onClick={e =>
                 mutate(params.id, {
@@ -74,7 +72,7 @@ const ProfileCard = () => {
             <div className="flex">
               <p>마지막 업데이트 : </p>
               <span className="ml-2">
-                {baekjoonData?.data?.[0]?.updated_at.slice(0, 10) || (
+                {fromNow(baekjoonData?.data?.[0]?.updated_at) || (
                   <Spinner className="w-4 h-4" />
                 )}
               </span>
