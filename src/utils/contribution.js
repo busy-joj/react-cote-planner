@@ -8,7 +8,7 @@ import {
   differenceInCalendarDays,
   subDays,
   getMonth,
-} from "date-fns";
+} from 'date-fns';
 
 // 지난 52주 날짜 구하기
 export const generateDate = () => {
@@ -18,8 +18,8 @@ export const generateDate = () => {
     end: today,
   });
 
-  return days.map((day) => {
-    const date = formatISO(day, { representation: "date" });
+  return days.map(day => {
+    const date = formatISO(day, { representation: 'date' });
     const count = 0;
     const again = null;
     const againCount = 0;
@@ -49,7 +49,7 @@ export const getAllActivities = () => {
       : subWeeks(nextDay(firstDay, weekStart), 1);
   const allActivities = [
     ...Array(differenceInCalendarDays(firstDay, firstCalendarDate)).fill(
-      undefined
+      undefined,
     ),
     ...normalizedActivities,
   ];
@@ -57,7 +57,7 @@ export const getAllActivities = () => {
 };
 
 // 지난 52주 날짜 주차별 구분
-export const groupDatesByWeeks = (array) => {
+export const groupDatesByWeeks = array => {
   const numberOfWeeks = Math.ceil(array.length / 7);
   return Array(numberOfWeeks)
     .fill(undefined)
@@ -65,7 +65,7 @@ export const groupDatesByWeeks = (array) => {
 };
 
 // 지난 52주 날짜 요일별 구분
-export const groupByDays = (array) => {
+export const groupByDays = array => {
   const newArr = [];
   array.map((day, index) => {
     if (day === undefined) {
@@ -85,7 +85,7 @@ export const groupByDays = (array) => {
 export const getMonthLabels = (weeks, monthNames) => {
   const monthLabels = weeks
     .reduce((labels, week, weekIndex) => {
-      const firstActivity = week.find((activity) => activity !== undefined);
+      const firstActivity = week.find(activity => activity !== undefined);
       const month = monthNames[getMonth(firstActivity.date)];
       const prevLabel = labels[labels.length - 1];
       if (weekIndex === 0 || prevLabel.label !== month) {
@@ -115,7 +115,7 @@ export const getMonthLabels = (weeks, monthNames) => {
   return monthLabels;
 };
 
-export const getLevel = (count) => {
+export const getLevel = count => {
   let level;
   if (count >= 1 && count <= 3) {
     level = 1;
@@ -127,4 +127,18 @@ export const getLevel = (count) => {
     level = 4;
   }
   return level;
+};
+
+export const isOneDayPassed = updateTime => {
+  // 현재 시간
+  const now = new Date();
+
+  // 업데이트 시간을 Date 객체로 변환
+  const updateDate = new Date(updateTime);
+
+  // 현재 시간과 업데이트 시간의 차이를 밀리초 단위로 계산
+  const diff = now - updateDate;
+
+  // 하루의 밀리초는 24 * 60 * 60 * 1000 = 86400000
+  return diff > 86400000;
 };

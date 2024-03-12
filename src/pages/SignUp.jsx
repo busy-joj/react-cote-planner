@@ -1,5 +1,4 @@
-import React, { useRef, useState } from 'react';
-import axios from 'axios';
+import React, { useState, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
 
@@ -10,6 +9,8 @@ import Spinner from '../components/common/Spinner';
 import ValidateMessage from '../components/common/ValidateMessage';
 import Button, { SubmitButton } from '../components/common/Button';
 import Input, { LabelInput, Label } from '../components/common/Input';
+import { useQueryClient } from '@tanstack/react-query';
+import fetchUserCheck from '@/apis/fetchUserCheck';
 
 const SignUpPage = () => {
   const navigate = useNavigate();
@@ -20,6 +21,9 @@ const SignUpPage = () => {
     checked: false,
     text: '인증',
   });
+
+  const queryClient = useQueryClient();
+
   const {
     register,
     formState: { errors },
@@ -55,31 +59,30 @@ const SignUpPage = () => {
     e.preventDefault();
     const baekjoonID = getValues('baekjoonID');
     checkChangeRef.current = baekjoonID;
+
     setBaekjoonValidation({
       ...baekjoonValidation,
       isLoading: true,
     });
-    await axios
-      .get(`${import.meta.env.VITE_SERVER_URL}login?userId=${baekjoonID}`)
-      .then(res => {
-        const code = res.data;
-        if (code === 404 || code === 403 || code === 401 || code === 402) {
-          setBaekjoonValidation({
-            ...baekjoonValidation,
-            text: '실패',
-            checked: false,
-          });
-        } else if (code === 200) {
-          setBaekjoonValidation({
-            ...baekjoonValidation,
-            text: '성공',
-            checked: true,
-          });
-        }
-      })
-      .catch(error => {
-        console.log('Error', error);
+    const code = await queryClient.fetchQuery({
+      queryKey: ['userCheck', baekjoonID],
+      queryFn: () => fetchUserCheck(baekjoonID),
+    });
+    if (code === 404 || code === 403 || code === 401 || code === 402) {
+      setBaekjoonValidation({
+        ...baekjoonValidation,
+        text: '실패',
+        checked: false,
+        isLoading: false,
       });
+    } else if (code === 200) {
+      setBaekjoonValidation({
+        ...baekjoonValidation,
+        text: '성공',
+        checked: true,
+        isLoading: false,
+      });
+    }
   };
 
   const HandleSignUp = async inputData => {
