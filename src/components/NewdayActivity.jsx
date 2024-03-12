@@ -64,11 +64,14 @@ const NewdayActivity = props => {
                   solvedTimeArray[0],
                 );
               }
-              if (allActivities[i].againCount == allActivities[i].count) {
-                allActivities[i].again = true;
-              }
             }
           }
+        }
+        if (
+          allActivities[i] &&
+          allActivities[i].againCount === allActivities[i].count
+        ) {
+          allActivities[i].again = true;
         }
       }
       return arr;
@@ -77,7 +80,6 @@ const NewdayActivity = props => {
     setnewdayActivity(groupByDays(DataActivities));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fetchSolvedProblem]);
-
   return (
     <>
       {newdayActivity.map((activities, index) => (
@@ -99,8 +101,8 @@ const NewdayActivity = props => {
                 {activity?.count == 0
                   ? `OMG... You didn't even solve💥`
                   : activity?.again
-                  ? `Great!😆 You reviewed ${activity.againCount}problem✨`
-                  : `OMG... You didn't review🥲`}
+                  ? `Great!😆 You reviewed ${activity?.againCount} problem✨`
+                  : `OMG... You reviewed ${activity?.againCount} problem🥲`}
               </span>
             </td>
           ))}
