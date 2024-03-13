@@ -10,6 +10,12 @@ import ProfilePage from './pages/Profile';
 import LoginPage from './pages/Login';
 import SignUpPage from './pages/SignUp';
 import SignUpConfirm from './pages/SignUpConfirm';
+import CheckPassword from './pages/CheckPassword';
+import Confirm from './pages/Confirm';
+import PrivateRoute from './utils/PrivateRoute';
+import PublicRoute from './utils/PublicRoute';
+import NotFound from './pages/NotFound';
+import NotReady from './pages/NotReady';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -33,9 +39,15 @@ const App = () => {
           <Routes>
             <Route path="/" element={<HomePage />}></Route>
             <Route path="/profile/:id" element={<ProfilePage />}></Route>
-            <Route path="/login" element={<LoginPage />}></Route>
-            <Route path="/signup" element={<SignUpPage />}></Route>
-            <Route path="/signup/confirm" element={<SignUpConfirm />}></Route>
+            <Route element={<PublicRoute />}>
+              <Route path="/login" element={<LoginPage />}></Route>
+              <Route path="/signup" element={<SignUpPage />}></Route>
+              <Route path="/signup/confirm" element={<SignUpConfirm />}></Route>
+              <Route path="/confirm/:state" element={<Confirm />}></Route>
+            </Route>
+            <Route path="/login/check" element={<CheckPassword />}></Route>
+            <Route path="/ready" element={<NotReady />}></Route>
+            <Route path="/*" element={<NotFound />}></Route>
           </Routes>
         </BrowserRouter>
         <ReactQueryDevtools initialIsOpen={false} />

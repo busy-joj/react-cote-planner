@@ -1,11 +1,11 @@
 import { create } from 'zustand';
 
 export const userStore = create(set => ({
-  userInfo: {},
+  userInfo: null,
   setUserInfo: data => {
     set({ userInfo: data });
   },
   deleteUserInfo: () => {
-    set({ userInfo: {} });
+    set({ userInfo: null });
   },
 }));

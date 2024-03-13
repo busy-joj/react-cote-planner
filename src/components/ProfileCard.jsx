@@ -13,6 +13,7 @@ import { fromNow } from '@/utils/contribution';
 const ProfileCard = () => {
   const { userInfo } = userStore();
   const params = useParams();
+
   const queryClient = useQueryClient();
   const { mutate } = useMutation({
     mutationFn: async baekjoonId => await fetchAchievement(baekjoonId),
@@ -34,9 +35,9 @@ const ProfileCard = () => {
     <section className="flex justify-between py-8">
       <article className="w-1/3">
         <picture>
-          {userInfo.avatar_url ? (
+          {userInfo?.avatar_url ? (
             <img
-              src={userInfo.avatar_url}
+              src={userInfo?.avatar_url}
               alt="프로필 사진"
               className="rounded-full object-contain max-h-[100px] bg-gray-300"
               width={100}
@@ -89,7 +90,7 @@ const ProfileCard = () => {
               </span>
             </div>
           </div>
-          {userInfo.user_name ? null : (
+          {userInfo?.user_name ? null : (
             <div className="border border-solid rounded-xl p-3.5 text-base border-gray-300 w-full">
               <Link to="/login">카카오 연동하고 나만의 PT를 받아보세요.</Link>
             </div>
