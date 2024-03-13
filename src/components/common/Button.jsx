@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useTransition } from 'react';
+import Spinner from '@/components/common/Spinner';
 import { cn } from '@/utils/cn';
 
 const Button = props => {
@@ -29,6 +30,41 @@ export const SubmitButton = props => {
       )}
     >
       {children}
+    </button>
+  );
+};
+
+export const LoadingButton = props => {
+  const {
+    className,
+    onClick,
+    isPending: mutateIsPending,
+    key,
+    children,
+  } = props;
+  const [isPending, startTransition] = useTransition();
+
+  const handleClick = e => {
+    startTransition(() => {
+      onClick(e);
+    });
+  };
+
+  return (
+    <button
+      onClick={handleClick}
+      disabled={isPending}
+      type="button"
+      className={cn(
+        'flex-shrink-0 text-white focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm py-2.5 text-center flex justify-center items-center',
+        className,
+      )}
+    >
+      {isPending || mutateIsPending ? (
+        <Spinner className="w-4 h-4" />
+      ) : (
+        children
+      )}
     </button>
   );
 };

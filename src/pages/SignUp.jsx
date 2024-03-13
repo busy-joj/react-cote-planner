@@ -1,5 +1,4 @@
-import React, { useRef, useState } from 'react';
-import axios from 'axios';
+import React, { useState, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
 
@@ -10,15 +9,21 @@ import Spinner from '../components/common/Spinner';
 import ValidateMessage from '../components/common/ValidateMessage';
 import Button, { SubmitButton } from '../components/common/Button';
 import Input, { LabelInput, Label } from '../components/common/Input';
+import { useQueryClient } from '@tanstack/react-query';
+import fetchUserCheck from '@/apis/fetchUserCheck';
 
 const SignUpPage = () => {
   const navigate = useNavigate();
   const checkChangeRef = useRef(null);
+  const [isLoadingSignup, setIsLoadingSignup] = useState(false);
   const [baekjoonValidation, setBaekjoonValidation] = useState({
     isLoading: false,
     checked: false,
     text: '인증',
   });
+
+  const queryClient = useQueryClient();
+
   const {
     register,
     formState: { errors },
@@ -54,35 +59,35 @@ const SignUpPage = () => {
     e.preventDefault();
     const baekjoonID = getValues('baekjoonID');
     checkChangeRef.current = baekjoonID;
+
     setBaekjoonValidation({
       ...baekjoonValidation,
       isLoading: true,
     });
-    await axios
-      .get(`${import.meta.env.VITE_SERVER_URL}login?userId=${baekjoonID}`)
-      .then(res => {
-        const code = res.data;
-        if (code === 404 || code === 403 || code === 401 || code === 402) {
-          setBaekjoonValidation({
-            ...baekjoonValidation,
-            text: '실패',
-            checked: false,
-          });
-        } else if (code === 200) {
-          setBaekjoonValidation({
-            ...baekjoonValidation,
-            text: '성공',
-            checked: true,
-          });
-        }
-      })
-      .catch(error => {
-        console.log('Error', error);
+    const code = await queryClient.fetchQuery({
+      queryKey: ['userCheck', baekjoonID],
+      queryFn: () => fetchUserCheck(baekjoonID),
+    });
+    if (code === 404 || code === 403 || code === 401 || code === 402) {
+      setBaekjoonValidation({
+        ...baekjoonValidation,
+        text: '실패',
+        checked: false,
+        isLoading: false,
       });
+    } else if (code === 200) {
+      setBaekjoonValidation({
+        ...baekjoonValidation,
+        text: '성공',
+        checked: true,
+        isLoading: false,
+      });
+    }
   };
 
   const HandleSignUp = async inputData => {
-    const { email, pw, username, BaekjoonID } = inputData;
+    const { email, pw, username, baekjoonID } = inputData;
+    setIsLoadingSignup(true);
     try {
       const { data, error } = await supabaseClient.auth.signUp({
         email: email,
@@ -91,12 +96,15 @@ const SignUpPage = () => {
           data: {
             user_name: username,
             avatar_url: null,
-            BaekjoonID: BaekjoonID,
+            baekjoon_id: baekjoonID,
           },
         },
       });
-      if (error) console.error(error);
-      navigate('/signup/confirm');
+      if (error) {
+        console.error(error);
+      } else {
+        navigate('/signup/confirm');
+      }
     } catch (error) {
       console.error(error);
     }
@@ -115,6 +123,19 @@ const SignUpPage = () => {
             placeholder="name@company.com"
             {...register('email', {
               required: '이메일을 입력해주세요',
+              onBlur: async e => {
+                const { data: profiles, error } = await supabaseClient
+                  .from('profiles')
+                  .select('email')
+                  .eq('email', e.target.value);
+                return (
+                  profiles.length > 0 &&
+                  setError('email', {
+                    type: 'emailCheckDuplication',
+                    message: '이미 가입된 이메일 입니다.',
+                  })
+                );
+              },
               pattern: {
                 value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
                 message: '이메일 형식으로 작성해주실래요?',
@@ -192,9 +213,9 @@ const SignUpPage = () => {
                 },
                 checkInclude: value => {
                   const reg = '^(?=.*[@$!%*#?&]).{1,}$';
-                  return (
-                    value.match(reg) || '하나 이상의 특수문자가 포함되어야 해요'
-                  );
+                  return value.match(reg)
+                    ? true
+                    : '하나 이상의 특수문자가 포함되어야 해요';
                 },
               },
             })}
@@ -228,7 +249,7 @@ const SignUpPage = () => {
           )}
         </div>
         <SubmitButton className="w-full text-white bg-primary-600 hover:bg-primary-700">
-          회원가입
+          {!isLoadingSignup ? '회원가입' : <Spinner className="w-4 h-4" />}
         </SubmitButton>
         <p className="text-sm font-light text-gray-500 dark:text-gray-400">
           이미 회원이신가요?{' '}
