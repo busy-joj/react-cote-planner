@@ -15,8 +15,9 @@ const ProfileCard = () => {
   const params = useParams();
 
   const queryClient = useQueryClient();
-  const { mutate } = useMutation({
+  const { mutate, isPending } = useMutation({
     mutationFn: async baekjoonId => await fetchAchievement(baekjoonId),
+    mutationKey: ['update', 'crawling', params.id],
   });
   const { data: baekjoonData, refetch } = useQuery({
     queryKey: ['solved', params.id],
@@ -53,6 +54,7 @@ const ProfileCard = () => {
           </h1>
           <div className="flex items-center gap-2 mb-4">
             <LoadingButton
+              isPending={isPending || !updated_at}
               onClick={e =>
                 mutate(params.id, {
                   onSuccess: async res => {
@@ -85,9 +87,9 @@ const ProfileCard = () => {
             </LoadingButton>
             <div className="flex">
               <p>마지막 업데이트 : </p>
-              <span className="ml-2">
-                {fromNow(updated_at) || <Spinner className="w-4 h-4" />}
-              </span>
+              {isPending || !updated_at ? null : (
+                <span className="ml-2">{fromNow(updated_at)}</span>
+              )}
             </div>
           </div>
           {userInfo?.user_name ? null : (

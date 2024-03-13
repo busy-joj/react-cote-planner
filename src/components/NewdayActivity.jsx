@@ -4,6 +4,7 @@ import {
   useMutation,
   useQueryClient,
   useSuspenseQuery,
+  useIsMutating,
 } from '@tanstack/react-query';
 import { supabaseClient } from '../supabase/client';
 import { isOneDayPassed } from '../utils/contribution';
@@ -47,6 +48,9 @@ const NewdayActivity = props => {
   const queryClient = useQueryClient();
   const { mutate } = useMutation({
     mutationFn: async baekjoonId => await fetchAchievement(baekjoonId),
+  });
+  const isMutatingCrawling = useIsMutating({
+    mutationKey: ['update', 'crawling', params.id],
   });
   const { data: baekjoonData } = useSuspenseQuery({
     queryKey: ['solved', params.id],
@@ -111,7 +115,7 @@ const NewdayActivity = props => {
   }, [fetchSolvedProblem, allActivities]);
   return (
     <>
-      {fetchSolvedCount ? (
+      {!isMutatingCrawling && fetchSolvedCount ? (
         newdayActivity.map((activities, index) => (
           <tr key={index}>
             <th className="text-xs w-8 text-left">{daysOfWeek[index]}</th>
