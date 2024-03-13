@@ -69,6 +69,7 @@ export const groupDatesByWeeks = array => {
 // 지난 52주 날짜 요일별 구분
 export const groupByDays = array => {
   const newArr = [];
+  if (!array) return newArr;
   array.map((day, index) => {
     if (day === undefined) {
       newArr[index] = Array(1).fill(undefined);
