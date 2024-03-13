@@ -7,6 +7,7 @@ import fetchAchievement from '@/apis/fetchAchievement';
 import { supabaseClient } from '../supabase/client';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import Refresh from '@/assets/refresh.svg?react';
+import DefaultUser from '@/assets/defaultUser.svg?react';
 import Spinner from './common/Spinner';
 import { fromNow } from '@/utils/contribution';
 
@@ -45,7 +46,9 @@ const ProfileCard = () => {
               height={100}
             />
           ) : (
-            <div className="w-[100px] h-[100px] bg-gray-300 rounded-full"></div>
+            <div className="w-[100px] h-[100px] bg-gray-300 rounded-full">
+              <DefaultUser />
+            </div>
           )}
         </picture>
         <div className="">
