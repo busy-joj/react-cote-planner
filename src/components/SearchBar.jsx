@@ -21,7 +21,7 @@ const SearchBar = () => {
         queryFn: () => fetchUserCheck(searchRef.current.value),
       });
 
-      if (userInfo.baekjoon_id !== searchRef.current.value) {
+      if (!userInfo || userInfo.baekjoon_id !== searchRef.current.value) {
         queryClient.prefetchQuery({
           queryKey: ['solved', searchRef.current.value],
           queryFn: () => fetchAchievement(searchRef.current.value),
