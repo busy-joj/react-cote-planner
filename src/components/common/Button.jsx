@@ -35,7 +35,13 @@ export const SubmitButton = props => {
 };
 
 export const LoadingButton = props => {
-  const { className, onClick, fetch, key, children } = props;
+  const {
+    className,
+    onClick,
+    isPending: mutateIsPending,
+    key,
+    children,
+  } = props;
   const [isPending, startTransition] = useTransition();
 
   const handleClick = e => {
@@ -54,7 +60,11 @@ export const LoadingButton = props => {
         className,
       )}
     >
-      {isPending ? <Spinner /> : children}
+      {isPending || mutateIsPending ? (
+        <Spinner className="w-4 h-4" />
+      ) : (
+        children
+      )}
     </button>
   );
 };

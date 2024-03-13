@@ -58,9 +58,12 @@ const SignUpConfirm = () => {
                     solved_problem: crawling.solved_problem,
                     solved_count: crawling.solved_count,
                     solved_recent: crawling.solved_recent,
+                    solved_total_count: crawling.solved_total_count,
+                    solved_day: crawling.solved_day,
+                    review_count: crawling.review_count,
+                    updated_at: crawling.updated_at,
                   })
-                  .eq('id', session.user.user_metadata.baekjoon_id)
-                  .select();
+                  .eq('id', session.user.user_metadata.baekjoon_id);
               }
             }, 0);
           }
