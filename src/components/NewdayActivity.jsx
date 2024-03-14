@@ -1,15 +1,16 @@
-import { useCallback, useEffect, useRef, useState, useTransition } from 'react';
-import { groupByDays, getLevel } from '@/utils/contribution';
-import { compareAsc, differenceInDays, formatISO } from 'date-fns';
+import { useEffect, useState } from 'react';
+import { groupByDays } from '@/utils/contribution';
 import {
   useMutation,
   useQueryClient,
   useSuspenseQuery,
+  useIsMutating,
 } from '@tanstack/react-query';
 import { supabaseClient } from '../supabase/client';
 import { isOneDayPassed } from '../utils/contribution';
 import fetchAchievement from '@/apis/fetchAchievement';
 import Skeleton from '@/components/Skeleton';
+import { checkSolvedTime } from '@/apis/crawling/backjoon';
 
 const ActivityLoading = () => {
   return (
@@ -48,6 +49,9 @@ const NewdayActivity = props => {
   const { mutate } = useMutation({
     mutationFn: async baekjoonId => await fetchAchievement(baekjoonId),
   });
+  const isMutatingCrawling = useIsMutating({
+    mutationKey: ['update', 'crawling', params.id],
+  });
   const { data: baekjoonData } = useSuspenseQuery({
     queryKey: ['solved', params.id],
     queryFn: async () =>
@@ -55,61 +59,8 @@ const NewdayActivity = props => {
   });
   const data = baekjoonData.data?.[0];
   const fetchSolvedProblem = data?.solved_problem;
-
   const fetchSolvedCount = data?.solved_count;
   const fetchSolvedRecent = data?.solved_recent;
-  const checkSolvedTime = useCallback(
-    (arr, arr2) => {
-      if (
-        newdayActivity.length ||
-        !Array.isArray(arr) ||
-        !Array.isArray(arr2)
-      ) {
-        return arr; // 유효하지 않은 경우, 원래 배열 반환
-      }
-      const arrLen = arr.length;
-      const arr2Len = arr2.length;
-      for (let i = 0; i < arrLen; i++) {
-        for (let k = 0; k < arr2Len; k++) {
-          if (typeof arr[i] === 'object' && arr[i].hasOwnProperty('date')) {
-            const date = arr[i].date;
-            const solvedTimeArray = arr2[k].solvedTime;
-            solvedTimeArray.sort(compareAsc);
-            const solvedTime = formatISO(arr2[k].solvedTime[0], {
-              representation: 'date',
-            });
-            if (date == solvedTime) {
-              allActivities[i].count++;
-              allActivities[i].level = getLevel(allActivities[i].count);
-              const daysSinceProblemSolved = differenceInDays(
-                new Date(),
-                solvedTime,
-              );
-              allActivities[i].overdue = daysSinceProblemSolved;
-              if (solvedTimeArray.length > 1) {
-                allActivities[i].againCount++;
-                allActivities[i].againLevel = getLevel(
-                  allActivities[i].againCount,
-                );
-                const daysSinceAgainSolved = differenceInDays(
-                  solvedTimeArray[1],
-                  solvedTimeArray[0],
-                );
-              }
-            }
-          }
-        }
-        if (
-          allActivities[i] &&
-          allActivities[i].againCount === allActivities[i].count
-        ) {
-          allActivities[i].again = true;
-        }
-      }
-      return arr;
-    },
-    [allActivities],
-  );
 
   useEffect(() => {
     // 하루 이상 지나면 데이터 업데이트
@@ -126,6 +77,9 @@ const NewdayActivity = props => {
                   solved_problem: crawlingData.solved_problem,
                   solved_count: crawlingData.solved_count,
                   solved_recent: crawlingData.solved_recent,
+                  solved_total_count: crawlingData.solved_total_count,
+                  solved_day: crawlingData.solved_day,
+                  review_count: crawlingData.review_count,
                   updated_at: crawlingData.updated_at,
                 },
               ])
@@ -152,13 +106,16 @@ const NewdayActivity = props => {
       };
       getNewData();
     }
-    const DataActivities = checkSolvedTime(allActivities, fetchSolvedProblem);
-    setnewdayActivity(groupByDays(DataActivities));
+    const { dataActivities, newdayActivity } = checkSolvedTime(
+      allActivities,
+      fetchSolvedProblem,
+    );
+    setnewdayActivity(groupByDays(dataActivities));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fetchSolvedProblem, allActivities]);
   return (
     <>
-      {fetchSolvedCount ? (
+      {!isMutatingCrawling && fetchSolvedCount ? (
         newdayActivity.map((activities, index) => (
           <tr key={index}>
             <th className="text-xs w-8 text-left">{daysOfWeek[index]}</th>

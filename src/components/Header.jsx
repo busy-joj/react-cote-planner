@@ -20,7 +20,7 @@ const Header = () => {
         } else if (event === 'SIGNED_OUT') {
           [window.localStorage, window.sessionStorage].forEach(storage => {
             Object.entries(storage).forEach(([key]) => {
-              stoWrage.removeItem(key);
+              storage.removeItem(key);
             });
           });
         }
