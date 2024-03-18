@@ -27,9 +27,9 @@ const Contribution = ({ params }) => {
 
   return (
     <div className="relative py-8">
-      <h2 className="font-bold mb-3 text-xl">Activities</h2>
-      <div className="shadow-md sm:rounded-lg p-8">
-        <table className="w-full border-spacing-1 border-separate">
+      <h2 className="font-bold mb-3 text-base lg:text-xl">Activities</h2>
+      <div className="shadow-md sm:rounded-lg lg:p-8 p-4 lg:overflow-auto overflow-x-scroll">
+        <table className="w-max lg:w-full border-spacing-1 border-separate">
           <thead className="text-xs text-gray-700">
             <tr>
               <th className="text-transparent text-left opacity-0">요일</th>
@@ -53,7 +53,7 @@ const Contribution = ({ params }) => {
             </Suspense>
           </tbody>
         </table>
-        <div className="flex gap-[3px] pt-3 justify-end items-center">
+        <div className="flex gap-[3px] pt-3 lg:justify-end items-center">
           <span className="text-gray-400 text-sm">Bad</span>
           <span className="w-4 h-4 rounded-tl-full rounded-br-full bg-bad-4-full inline-block"></span>
           <span className="w-4 h-4 rounded-tl-full rounded-br-full bg-bad-3-full inline-block"></span>

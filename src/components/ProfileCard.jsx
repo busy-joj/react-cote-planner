@@ -34,27 +34,25 @@ const ProfileCard = () => {
   const review_count = data?.review_count;
   const review_ratio = Math.floor((review_count / solved_total_count) * 100);
   return (
-    <section className="flex justify-between py-8">
-      <article className="w-1/3">
+    <section className="grid grid-rows-2 grid-cols-2 gap-2 lg:gap-4 lg:grid-rows-1 lg:grid-cols-3">
+      <article className="col-start-1 col-end-3 lg:col-start-1 lg:col-end-2">
         <picture>
           {userInfo?.avatar_url ? (
             <img
               src={userInfo?.avatar_url}
               alt="프로필 사진"
               className="rounded-full object-contain max-h-[100px] bg-gray-300"
-              width={100}
-              height={100}
             />
           ) : (
-            <div className="w-[100px] h-[100px] bg-gray-300 rounded-full">
+            <div className="lg:w-[100px] lg:h-[100px] w-[70px] h-[70px] bg-gray-300 rounded-full">
               <DefaultUser />
             </div>
           )}
         </picture>
         <div className="">
-          <h1 className="font-bold text-3xl mb-3">
+          <h2 className="font-bold lg:text-3xl text-md my-3">
             {params.id || userInfo.user_name}
-          </h1>
+          </h2>
           <div className="flex items-center gap-2 mb-4">
             <LoadingButton
               isPending={isPending || !updated_at}
@@ -84,11 +82,11 @@ const ProfileCard = () => {
                   },
                 })
               }
-              className={`bg-primary-600 w-10 h-8 text-white`}
+              className={`bg-primary-600 lg:w-10 lg:h-8 w-8 h-6 text-white lg:py-2 py-1`}
             >
               <Refresh />
             </LoadingButton>
-            <div className="flex">
+            <div className="flex text-sm lg:text-base">
               <p>마지막 업데이트 : </p>
               {isPending || !updated_at ? null : (
                 <span className="ml-2">{fromNow(updated_at)}</span>
@@ -96,21 +94,23 @@ const ProfileCard = () => {
             </div>
           </div>
           {userInfo?.user_name ? null : (
-            <div className="border border-solid rounded-xl p-3.5 text-base border-gray-300 w-full">
-              <Link to="/login">카카오 연동하고 나만의 PT를 받아보세요.</Link>
+            <div className="border border-solid rounded-lg lg:rounded-xl p-2 lg:p-3.5 text-sm lg:text-base border-gray-300 w-full">
+              <Link to="/login">
+                🔔 카카오 연동하고 나만의 PT를 받아보세요.
+              </Link>
             </div>
           )}
         </div>
       </article>
-      <article className="w-1/3 h-60 bg-profileCard-study rounded-xl font-bold text-white p-8 mx-6">
-        <p>학습일</p>
-        <div className="flex justify-center items-center h-full">
-          <p className="text-3xl">{solved_day || '-'}일 / 365일</p>
+      <article className="col-start-1 col-end-2 bg-profileCard-study rounded-lg lg:rounded-xl font-bold text-white p-3 lg:p-8 flex flex-col lg:col-start-2 lg:col-end-3">
+        <p className="text-base lg:text-lg">학습일</p>
+        <div className="flex justify-center items-center h-full text-lg lg:text-3xl">
+          {solved_day || '-'}일 / 365일
         </div>
       </article>
-      <article className="w-1/3 h-60 bg-profileCard-review rounded-xl font-bold text-white p-8">
-        <p>복습력</p>
-        <div className="flex justify-around items-center h-full">
+      <article className="col-start-2 col-end-3 bg-profileCard-review rounded-lg lg:rounded-xl font-bold text-white p-3 lg:p-8 flex flex-col lg:col-start-3 lg:col-end-4">
+        <p className="text-base lg:text-lg">복습력</p>
+        <div className="flex justify-around items-center h-full flex-col md:flex-row gap-1">
           <DonutChart
             width={100}
             height={100}
@@ -118,7 +118,7 @@ const ProfileCard = () => {
             innerRadius={40}
             outerRadius={49}
           />
-          <ul className="list-disc text-base">
+          <ul className="list-disc text-sm lg:text-base">
             <li>문제 해결 {solved_total_count}문제</li>
             <li>복습 {review_count}문제</li>
           </ul>
