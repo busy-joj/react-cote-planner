@@ -123,13 +123,13 @@ const NewdayActivity = props => {
               <td
                 key={index}
                 data-date={activity?.date}
-                className={`w-4 h-4 ${
+                className={`md:w-4 md:h-4 w-3 h-3 ${
                   activity == undefined && 'opacity-0'
                 } ${`${
                   activity?.again
                     ? activityBgColor['good'][activity?.level]
                     : activityBgColor['bad'][activity?.level]
-                }`} justify-self-center rounded-tl-full rounded-br-full relative after:content-['|'] after:absolute after:left-[30%] after:rotate-[45deg] after:top-[10%] after:font-thin  group`}
+                }`} justify-self-center rounded-tl-full rounded-br-full relative after:content-['|'] after:absolute md:after:left-[30%] md:after:rotate-[45deg] md:after:top-[10%] after:left-[29%] after:rotate-[30deg] after:top-[9%] after:font-thin group`}
               >
                 <span className="hidden rounded-md group-hover:inline-block absolute text-xs z-10 w-max px-2 py-1 origin-center translate-x-[-50%] translate-y-[-130%] ml-2 bg-slate-950 text-white cursor-default before:content-[''] before:w-2 before:h-2 before:bg-slate-950 before:inline-block before:absolute before:top-[100%] before:left-[50%] before:rotate-45 before:origin-center before:translate-x-[-50%] before:translate-y-[-50%] text-center">
                   You solved {activity?.count} problem on {activity?.date}

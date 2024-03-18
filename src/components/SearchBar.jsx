@@ -21,7 +21,7 @@ const SearchBar = () => {
         queryFn: () => fetchUserCheck(searchRef.current.value),
       });
 
-      if (userInfo.baekjoon_id !== searchRef.current.value) {
+      if (!userInfo || userInfo.baekjoon_id !== searchRef.current.value) {
         queryClient.prefetchQuery({
           queryKey: ['solved', searchRef.current.value],
           queryFn: () => fetchAchievement(searchRef.current.value),
@@ -37,7 +37,7 @@ const SearchBar = () => {
     checkID();
   };
   return (
-    <form onSubmit={handleSubmit} className="py-4">
+    <form onSubmit={handleSubmit} className="py-4 px-3 lg:px-0">
       <label
         htmlFor="default-search"
         className="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white"

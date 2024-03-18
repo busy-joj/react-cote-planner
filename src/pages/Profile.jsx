@@ -7,7 +7,7 @@ import { useParams } from 'react-router-dom';
 const ProfilePage = () => {
   const params = useParams();
   return (
-    <div className="w-[1200px] my-0 mx-auto pt-[60px]">
+    <div className="lg:w-[1200px] my-0 mx-auto pt-[60px] px-[16px] lg:px-0">
       <ProfileCard />
       <Contribution params={params} />
       {/* <Table params={params} /> */}
