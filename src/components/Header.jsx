@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
+import { GiHamburgerMenu } from 'react-icons/gi';
 import { Link, useLocation } from 'react-router-dom';
 
 import { userStore } from '@/store';
-import { GiHamburgerMenu } from 'react-icons/gi';
-import AvatarButton from './AvatarButton';
+
 import { supabaseClient } from '../supabase/client';
+import AvatarButton from './AvatarButton';
 
 const Header = () => {
   const { pathname } = useLocation();
