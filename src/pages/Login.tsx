@@ -43,7 +43,7 @@ const LoginPage = () => {
       return;
     }
   };
-  const handleLoginKakao = async e => {
+  const handleLoginKakao = async (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
     e.preventDefault();
     try {
       const { data, error } = await supabaseClient.auth.signInWithOAuth({
@@ -71,7 +71,6 @@ const LoginPage = () => {
         <div>
           <Input
             id="userEmail"
-            name="userEmail"
             type="text"
             onFocus={() => clearErrors('login')}
             placeholder="이메일을 입력해주세요"
@@ -82,6 +81,7 @@ const LoginPage = () => {
                 message: '이메일 형식으로 작성해주실래요?',
               },
             })}
+            name="userEmail"
           />
           {errors.userEmail && (
             <ValidateMessage>{errors.userEmail.message}</ValidateMessage>
@@ -90,13 +90,13 @@ const LoginPage = () => {
         <div>
           <Input
             id="userPW"
-            name="userPW"
             type="password"
             onFocus={() => clearErrors('login')}
             placeholder="비밀번호를 입력해주세요"
             {...register('userPW', {
               required: '비밀번호를 입력하세요',
             })}
+            name="userPW"
           />
 
           {errors.userPW && (

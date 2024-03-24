@@ -39,20 +39,23 @@ export const SubmitButton = (props:IButtonProps) => {
   );
 };
 
-// TODO 토니
-export const LoadingButton = (props:IButtonProps) => {
+interface ILoadingBtnProps extends IDefaultProps {
+  onClick: () => void;
+  isPending: boolean,
+}
+
+export const LoadingButton = (props:ILoadingBtnProps) => {
   const {
-    className,
+    className="",
     onClick,
     isPending: mutateIsPending,
-    key,
     children,
   } = props;
   const [isPending, startTransition] = useTransition();
 
-  const handleClick = e => {
+  const handleClick = () => {
     startTransition(() => {
-      onClick(e);
+      onClick();
     });
   };
 

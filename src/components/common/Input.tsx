@@ -1,8 +1,17 @@
-import { forwardRef } from 'react';
+import { forwardRef, HTMLInputTypeAttribute } from 'react';
 import { cn } from '@/utils/cn';
+import IDefaultProps from '@/types/common/props';
 
-const Input = forwardRef(
-  ({ id, name, type, placeholder, className, ...props }, ref) => {
+interface IInputProp extends IDefaultProps {
+  id: string,
+  name: string,
+  type: HTMLInputTypeAttribute,
+  onFocus:() => void,
+  placeholder: string
+}
+
+const Input = forwardRef<HTMLInputElement,IInputProp>(
+  ({ id, name, type, placeholder, className="", ...props }, ref) => {
     return (
       <input
         type={type}
@@ -21,7 +30,11 @@ const Input = forwardRef(
   },
 );
 
-export const Label = ({ htmlFor, children }) => {
+interface ILabelProp extends IDefaultProps {
+  htmlFor: string
+}
+
+export const Label = ({ htmlFor, children }: ILabelProp) => {
   return (
     <label
       htmlFor={htmlFor}
@@ -32,8 +45,8 @@ export const Label = ({ htmlFor, children }) => {
   );
 };
 
-export const LabelInput = forwardRef(
-  ({ id, name, type, placeholder, className, children, ...props }, ref) => {
+export const LabelInput = forwardRef<HTMLInputElement,IInputProp>(
+  ({ id, name, type, placeholder, className="", children, ...props }, ref) => {
     return (
       <>
         <label
