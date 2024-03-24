@@ -1,9 +1,14 @@
-import React, { useTransition } from 'react';
+import { useTransition } from 'react';
 import Spinner from '@/components/common/Spinner';
 import { cn } from '@/utils/cn';
+import IDefaultProps from '@/types/common/props';
 
-const Button = props => {
-  const { className, onClick, children } = props;
+interface IButtonProps extends IDefaultProps {
+  onClick?: (e: React.MouseEvent<HTMLElement, MouseEvent>) => void;
+}
+
+const Button = (props:IButtonProps) => {
+  const { className="", onClick, children } = props;
   return (
     <button
       onClick={onClick}
@@ -18,8 +23,8 @@ const Button = props => {
   );
 };
 
-export const SubmitButton = props => {
-  const { className, onClick, children } = props;
+export const SubmitButton = (props:IButtonProps) => {
+  const { className="", onClick, children } = props;
   return (
     <button
       onClick={onClick}
@@ -34,7 +39,8 @@ export const SubmitButton = props => {
   );
 };
 
-export const LoadingButton = props => {
+// TODO 토니
+export const LoadingButton = (props:IButtonProps) => {
   const {
     className,
     onClick,

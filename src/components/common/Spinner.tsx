@@ -1,8 +1,8 @@
-import React from 'react';
+import IDefaultProps from '@/types/common/props';
 import { cn } from '@/utils/cn';
 
-const Spinner = props => {
-  const { className } = props;
+const Spinner = (props: IDefaultProps) => {
+  const { className="" } = props;
   return (
     <div role="status">
       <svg
