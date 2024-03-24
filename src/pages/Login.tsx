@@ -26,7 +26,7 @@ const LoginPage = () => {
   const onSubmit:SubmitHandler<IFormValues> = async data => {
     const { userEmail, userPW } = data;
     try {
-      const { data, error } = await supabaseClient.auth.signInWithPassword({
+      const { error } = await supabaseClient.auth.signInWithPassword({
         email: userEmail,
         password: userPW,
       });
@@ -46,7 +46,7 @@ const LoginPage = () => {
   const handleLoginKakao = async (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
     e.preventDefault();
     try {
-      const { data, error } = await supabaseClient.auth.signInWithOAuth({
+      const { error } = await supabaseClient.auth.signInWithOAuth({
         provider: 'kakao',
       });
       if (error) console.error(error);
