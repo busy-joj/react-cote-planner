@@ -1,6 +1,9 @@
-export interface ICommonResponse<T> {
+export interface ResponseData<T> {
+  data: T
+}
+
+export interface ICommonResponse<T> extends ResponseData<T>{
   code: 'SUCCESS' | 'ERROR' | 'FAIL';
-  data: T;
   message: string;
   statusCode: number;
 }

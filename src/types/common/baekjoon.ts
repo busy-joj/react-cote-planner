@@ -19,6 +19,14 @@ export type ICustomSolvedProblem = IBaseSolvedProblem & ISolvedTimeArray;
 
 
 export interface IBaekjoonCrawlingData {
+  solved_problem: ISolvedProblem[]
+  solved_count: number
+  solved_recent: string
+  updated_at: Date
+  today: Date
+}
+
+export interface ICustomBaekjoonCrawlingData {
   solved_problem: ICustomSolvedProblem[]
   solved_count: number
   solved_recent: string
