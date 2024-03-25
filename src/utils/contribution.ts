@@ -76,7 +76,7 @@ export const groupByDays = (allActivities:I365DateType[]) => {
       newActivities[index] = Array(1).fill(null);
     } else {
       const { date } = day;
-      if (newActivities[getDay(date)] === null) {
+      if (!newActivities[getDay(date)]) {
         newActivities[getDay(date)] = [];
       }
       newActivities[getDay(date)]?.push(day);
