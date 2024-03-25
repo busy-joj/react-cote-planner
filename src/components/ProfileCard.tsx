@@ -14,6 +14,7 @@ import DonutChart from './DonutChart';
 import { IBaekjoonTable } from '@/types/common/supabase';
 import { ResponseData } from '@/types/common/response';
 import { ICustomBaekjoonCrawlingData } from '@/types/common/baekjoon';
+import { PostgrestMaybeSingleResponse } from '@supabase/supabase-js';
 
 const ProfileCard = () => {
   const { userInfo } = userStore();
@@ -26,11 +27,11 @@ const ProfileCard = () => {
   });
   const { data: baekjoonData } = useQuery({
     queryKey: ['solved', params.id],
-    queryFn: async () =>
+    queryFn: async (): Promise<PostgrestMaybeSingleResponse<IBaekjoonTable[]>> =>
       await supabaseClient.from('baekjoon').select('*').eq('id', params.id),
     enabled: false,
   });
-  const data: IBaekjoonTable = baekjoonData?.data?.[0];
+  const data = baekjoonData?.data?.[0] as IBaekjoonTable;
   const updated_at = data?.updated_at;
   const solved_day = data?.solved_day;
   const solved_total_count = data?.solved_total_count;
