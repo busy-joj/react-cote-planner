@@ -20,7 +20,13 @@ const ActivityLoading = () => {
   );
 };
 
-const Contribution = ({ params }) => {
+interface IProps {
+  params: {
+    id: string
+  }
+}
+
+const Contribution = ({ params }: IProps) => {
   const allActivities = getAllActivities();
   const weeks = groupDatesByWeeks(allActivities);
   const monthLabel = getMonthLabels(weeks, DEFAULT_MONTH_LABELS);

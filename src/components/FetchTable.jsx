@@ -1,9 +1,9 @@
+import { getBaekjoonSolvedData } from '@/apis/crawling/baekjoon';
 import useGetData from '@/hooks/useGetData';
-import { getBackjoonSolvedData } from '@/apis/crawling/backjoon';
 const FetchTable = ({ params }) => {
   const problemData = useGetData(
     `achievement?id=${params.id}`,
-    getBackjoonSolvedData,
+    getBaekjoonSolvedData,
   );
 
   return (

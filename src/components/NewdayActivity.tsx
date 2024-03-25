@@ -1,16 +1,23 @@
-import { useEffect, useState } from 'react';
-import { groupByDays } from '@/utils/contribution';
 import {
+  useIsMutating,
   useMutation,
   useQueryClient,
   useSuspenseQuery,
-  useIsMutating,
 } from '@tanstack/react-query';
-import { supabaseClient } from '../supabase/client';
-import { isOneDayPassed } from '../utils/contribution';
+import { useEffect, useState } from 'react';
+
+import { checkSolvedTime } from '@/apis/crawling/baekjoon';
 import fetchAchievement from '@/apis/fetchAchievement';
 import Skeleton from '@/components/Skeleton';
-import { checkSolvedTime } from '@/apis/crawling/backjoon';
+import { groupByDays } from '@/utils/contribution';
+
+import { supabaseClient } from '../supabase/client';
+import { isOneDayPassed } from '../utils/contribution';
+import { I365DateType } from '@/types/contribution';
+import { IBaekjoonTable } from '@/types/common/supabase';
+import { PostgrestMaybeSingleResponse } from '@supabase/supabase-js';
+import { ResponseData } from '@/types/common/response';
+import { ICustomBaekjoonCrawlingData } from '@/types/common/baekjoon';
 
 const ActivityLoading = () => {
   return (
@@ -24,7 +31,16 @@ const ActivityLoading = () => {
   );
 };
 
-const activityBgColor = {
+interface IActivityBgColor {
+  good: {
+    [key: number]: string
+  },
+  bad: {
+    [key: number]: string
+  }
+}
+
+const activityBgColor:IActivityBgColor = {
   good: {
     0: 'bg-[#F0F0EF] after:text-[#E6E6E6]',
     1: 'bg-[#D0E7D2] after:text-[#B9D8BC]',
@@ -41,34 +57,40 @@ const activityBgColor = {
   },
 };
 
-const NewdayActivity = props => {
+interface IProps {
+  allActivities: I365DateType[]
+  params: {
+    id: string
+  }
+}
+
+const NewdayActivity = (props: IProps) => {
   const { allActivities, params } = props;
-  const [newdayActivity, setnewdayActivity] = useState([]);
+  const [newdayActivity, setnewdayActivity] = useState<(I365DateType[] | null)[]>([]);
   const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   const queryClient = useQueryClient();
   const { mutate } = useMutation({
-    mutationFn: async baekjoonId => await fetchAchievement(baekjoonId),
+    mutationFn: async (baekjoonId: string): Promise<ResponseData<ICustomBaekjoonCrawlingData[]>> => await fetchAchievement(baekjoonId),
   });
   const isMutatingCrawling = useIsMutating({
     mutationKey: ['update', 'crawling', params.id],
   });
   const { data: baekjoonData } = useSuspenseQuery({
     queryKey: ['solved', params.id],
-    queryFn: async () =>
+    queryFn: async (): Promise<PostgrestMaybeSingleResponse<IBaekjoonTable[]>>  =>
       await supabaseClient.from('baekjoon').select('*').eq('id', params.id),
   });
-  const data = baekjoonData.data?.[0];
+  const data = baekjoonData.data?.[0] as IBaekjoonTable;
   const fetchSolvedProblem = data?.solved_problem;
   const fetchSolvedCount = data?.solved_count;
-  const fetchSolvedRecent = data?.solved_recent;
 
   useEffect(() => {
     // 하루 이상 지나면 데이터 업데이트
     if (data?.updated_at && isOneDayPassed(data?.updated_at)) {
       const updateOneDayPassed = async () => {
         mutate(params.id, {
-          onSuccess: async res => {
-            const crawlingData = res.data[0];
+          onSuccess: async (res: ResponseData<ICustomBaekjoonCrawlingData[]>) => {
+            const crawlingData: ICustomBaekjoonCrawlingData = res.data[0];
             queryClient.setQueryData(['solved', params.id], crawlingData);
             await supabaseClient
               .from('baekjoon')
@@ -98,7 +120,7 @@ const NewdayActivity = props => {
       updateOneDayPassed();
     } else if (!fetchSolvedProblem) {
       const getNewData = async () => {
-        const crawlingData = await fetchAchievement(params.id);
+        const crawlingData: ResponseData<ICustomBaekjoonCrawlingData[]> = await fetchAchievement(params.id);
         queryClient.setQueryData(
           ['solved', params.id], // todo crawling 지우고 캐시 삭제 후 저장하는 형태로하기
           crawlingData,
@@ -106,7 +128,7 @@ const NewdayActivity = props => {
       };
       getNewData();
     }
-    const { dataActivities, newdayActivity } = checkSolvedTime(
+    const { dataActivities } = checkSolvedTime(
       allActivities,
       fetchSolvedProblem,
     );
@@ -116,19 +138,19 @@ const NewdayActivity = props => {
   return (
     <>
       {!isMutatingCrawling && fetchSolvedCount ? (
-        newdayActivity.map((activities, index) => (
+        newdayActivity.map((activities: I365DateType[] | null, index) => (
           <tr key={index}>
             <th className="text-xs w-8 text-left">{daysOfWeek[index]}</th>
-            {activities.map((activity, index) => (
+            {activities && activities.map((activity: I365DateType, index) => (
               <td
                 key={index}
                 data-date={activity?.date}
                 className={`md:w-4 md:h-4 w-3 h-3 ${
-                  activity == undefined && 'opacity-0'
+                  activity == null && 'opacity-0'
                 } ${`${
                   activity?.again
-                    ? activityBgColor['good'][activity?.level]
-                    : activityBgColor['bad'][activity?.level]
+                    ? activityBgColor['good'][activity.level]
+                    : activityBgColor['bad'][activity?.level || 0]
                 }`} justify-self-center rounded-tl-full rounded-br-full relative after:content-['|'] after:absolute md:after:left-[30%] md:after:rotate-[45deg] md:after:top-[10%] after:left-[29%] after:rotate-[30deg] after:top-[9%] after:font-thin group`}
               >
                 <span className="hidden rounded-md group-hover:inline-block absolute text-xs z-10 w-max px-2 py-1 origin-center translate-x-[-50%] translate-y-[-130%] ml-2 bg-slate-950 text-white cursor-default before:content-[''] before:w-2 before:h-2 before:bg-slate-950 before:inline-block before:absolute before:top-[100%] before:left-[50%] before:rotate-45 before:origin-center before:translate-x-[-50%] before:translate-y-[-50%] text-center">

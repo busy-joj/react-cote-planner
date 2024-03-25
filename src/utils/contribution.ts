@@ -1,3 +1,4 @@
+import { I365DateLabel, I365DateType, IGenerateDate, MonthLabelType } from '@/types/contribution';
 import {
   eachDayOfInterval,
   formatISO,
@@ -13,15 +14,15 @@ import {
 } from 'date-fns';
 import { ko } from 'date-fns/locale';
 // 지난 52주 날짜 구하기
-export const generateDate = () => {
+export const generateDate = (): IGenerateDate[] => {
   const today = new Date();
-  const days = eachDayOfInterval({
+  const days: Date[] = eachDayOfInterval({
     start: subDays(today, 364),
     end: today,
   });
 
-  return days.map(day => {
-    const date = formatISO(day, { representation: 'date' });
+  return days.map((day: Date):IGenerateDate => {
+    const date:string = formatISO(day, { representation: 'date' });
     const count = 0;
     const again = null;
     const againCount = 0;
@@ -41,17 +42,17 @@ export const generateDate = () => {
 };
 
 // 365일 배열 만들기
-export const getAllActivities = () => {
+export const getAllActivities = (): I365DateType[] => {
   const weekStart = 0; // 시작은 sunday
-  const normalizedActivities = generateDate();
-  const firstDay = parseISO(normalizedActivities[0].date);
-  const firstCalendarDate =
+  const normalizedActivities: IGenerateDate[] = generateDate();
+  const firstDay: Date = parseISO(normalizedActivities[0].date);
+  const firstCalendarDate: Date =
     getDay(firstDay) === weekStart
       ? firstDay
       : subWeeks(nextDay(firstDay, weekStart), 1);
-  const allActivities = [
+  const allActivities: I365DateType[] = [
     ...Array(differenceInCalendarDays(firstDay, firstCalendarDate)).fill(
-      undefined,
+      null,
     ),
     ...normalizedActivities,
   ];
@@ -59,44 +60,44 @@ export const getAllActivities = () => {
 };
 
 // 지난 52주 날짜 주차별 구분
-export const groupDatesByWeeks = array => {
-  const numberOfWeeks = Math.ceil(array.length / 7);
+export const groupDatesByWeeks = (allActivities:I365DateType[]): I365DateType[][] => {
+  const numberOfWeeks:number = Math.ceil(allActivities.length / 7);
   return Array(numberOfWeeks)
-    .fill(undefined)
-    .map((_, weekIndex) => array.slice(weekIndex * 7, weekIndex * 7 + 7));
+    .fill(null)
+    .map((_, weekIndex) => allActivities.slice(weekIndex * 7, weekIndex * 7 + 7));
 };
 
 // 지난 52주 날짜 요일별 구분
-export const groupByDays = array => {
-  const newArr = [];
-  if (!array) return newArr;
-  array.map((day, index) => {
-    if (day === undefined) {
-      newArr[index] = Array(1).fill(undefined);
+export const groupByDays = (allActivities:I365DateType[]) => {
+  const newActivities: (I365DateType[] | null)[] = [];
+  if (!allActivities) return newActivities;
+  allActivities.map((day: I365DateType, index) => {
+    if (day === null) {
+      newActivities[index] = Array(1).fill(null);
     } else {
       const { date } = day;
-      if (newArr[getDay(date)] === undefined) {
-        newArr[getDay(date)] = [];
+      if (!newActivities[getDay(date)]) {
+        newActivities[getDay(date)] = [];
       }
-      newArr[getDay(date)].push(day);
+      newActivities[getDay(date)]?.push(day);
     }
   });
-  return newArr;
+  return newActivities;
 };
 
 // 월별 위치 파악 함수
-export const getMonthLabels = (weeks, monthNames) => {
-  const monthLabels = weeks
-    .reduce((labels, week, weekIndex) => {
-      const firstActivity = week.find(activity => activity !== undefined);
-      const month = monthNames[getMonth(firstActivity.date)];
-      const prevLabel = labels[labels.length - 1];
+export const getMonthLabels = (weeks:I365DateType[][], monthNames: MonthLabelType[]): I365DateLabel[] => {
+  const monthLabels: I365DateLabel[] = weeks
+    .reduce<I365DateLabel[]>((labels: I365DateLabel[], week: I365DateType[], weekIndex: number) => {
+      const firstActivity: I365DateType | undefined = week.find((activity: I365DateType) => activity !== null);
+      const month: MonthLabelType = monthNames[getMonth(firstActivity!.date)];
+      const prevLabel: I365DateLabel = labels[labels.length - 1];
       if (weekIndex === 0 || prevLabel.label !== month) {
         return [...labels, { weekIndex, label: month }];
       }
       return labels;
     }, [])
-    .filter(({ weekIndex }, index, labels) => {
+    .filter(({ weekIndex }: I365DateLabel, index, labels: I365DateLabel[]) => {
       const minWeeks = 3;
       if (index === 0) {
         return labels[1] && labels[1].weekIndex - weekIndex >= minWeeks;
@@ -106,6 +107,7 @@ export const getMonthLabels = (weeks, monthNames) => {
       }
       return true;
     });
+
   monthLabels.forEach((_, index) => {
     if (index > 0) {
       monthLabels[index - 1].weekIndex =
@@ -118,8 +120,8 @@ export const getMonthLabels = (weeks, monthNames) => {
   return monthLabels;
 };
 
-export const getLevel = count => {
-  let level;
+export const getLevel = (count: number) => {
+  let level: number = 0;
   if (count >= 1 && count <= 3) {
     level = 1;
   } else if (count >= 4 && count <= 6) {
@@ -132,7 +134,7 @@ export const getLevel = count => {
   return level;
 };
 
-export const isOneDayPassed = updateTime => {
+export const isOneDayPassed = (updateTime: Date) => {
   // 현재 시간
   const now = new Date();
 
@@ -140,13 +142,13 @@ export const isOneDayPassed = updateTime => {
   const updateDate = new Date(updateTime);
 
   // 현재 시간과 업데이트 시간의 차이를 밀리초 단위로 계산
-  const diff = now - updateDate;
+  const diff: number = +now - +updateDate;
 
   // 하루의 밀리초는 24 * 60 * 60 * 1000 = 86400000
   return diff > 86400000;
 };
 
-export const fromNow = date => {
+export const fromNow = (date: Date) => {
   if (!date) {
     return null;
   }

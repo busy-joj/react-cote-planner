@@ -3,7 +3,7 @@ import { useState, useEffect, useMemo } from 'react';
 const PROGRESS_UNIT = 0.01;
 const PROGRESS_TIMEOUT = 5;
 
-const getArcPath = (start, end, innerRadius, outerRadius) => {
+const getArcPath = (start: number, end: number, innerRadius: number, outerRadius: number) => {
   const startAngle = start * Math.PI * 2;
   const endAngle = end * Math.PI * 2;
   const x1 = innerRadius * Math.sin(startAngle);
@@ -21,7 +21,15 @@ const getArcPath = (start, end, innerRadius, outerRadius) => {
         L ${x4},${y4} A ${innerRadius} ${innerRadius} ${innerFlags} ${x1},${y1} Z`;
 };
 
-const DonutChart = ({ width, height, value, innerRadius, outerRadius }) => {
+interface IDonutChart {
+  width: number
+  height: number
+  value:number
+  innerRadius: number
+  outerRadius: number
+}
+
+const DonutChart = ({ width, height, value, innerRadius, outerRadius }: IDonutChart) => {
   const [visiblePart, setVisiblePart] = useState(0);
   const items = useMemo(
     () => [
