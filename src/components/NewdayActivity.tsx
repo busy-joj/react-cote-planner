@@ -83,7 +83,6 @@ const NewdayActivity = (props: IProps) => {
   const data = baekjoonData.data?.[0] as IBaekjoonTable;
   const fetchSolvedProblem = data?.solved_problem;
   const fetchSolvedCount = data?.solved_count;
-  const fetchSolvedRecent = data?.solved_recent;
 
   useEffect(() => {
     // 하루 이상 지나면 데이터 업데이트

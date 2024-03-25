@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Link, Params } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
 
 import fetchAchievement from '@/apis/fetchAchievement';
@@ -35,7 +35,6 @@ const ProfileCard = () => {
   const updated_at = data?.updated_at;
   const solved_day = data?.solved_day;
   const solved_total_count = data?.solved_total_count;
-  const solved_count = data?.solved_count;
   const review_count = data?.review_count;
   const review_ratio = Math.floor((review_count / solved_total_count) * 100);
   return (
