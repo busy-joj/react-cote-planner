@@ -1,14 +1,17 @@
-import axios from 'axios';
-import React, { useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
-import { supabaseClient } from '../supabase/client';
-import SignLayout from '../components/SignLayout';
+import { supabaseClient } from '@/supabase/client';
+import SignLayout from '@components/SignLayout';
 import Button, { SubmitButton } from '../components/common/Button';
 import Input from '../components/common/Input';
-import { useForm } from 'react-hook-form';
-import ValidateMessage from '../components/common/ValidateMessage';
+import { useForm, SubmitHandler } from 'react-hook-form';
+import ValidateMessage from '@components/common/ValidateMessage'
 
+interface IFormValues {
+  userEmail:string,
+  userPW:string,
+  login:string
+}
 const LoginPage = () => {
   const navigate = useNavigate();
 
@@ -18,12 +21,12 @@ const LoginPage = () => {
     clearErrors,
     setError,
     handleSubmit,
-  } = useForm({ mode: 'onChange' });
+  } = useForm<IFormValues>({ mode: 'onChange' });
 
-  const onSubmit = async data => {
+  const onSubmit:SubmitHandler<IFormValues> = async data => {
     const { userEmail, userPW } = data;
     try {
-      const { data, error } = await supabaseClient.auth.signInWithPassword({
+      const { error } = await supabaseClient.auth.signInWithPassword({
         email: userEmail,
         password: userPW,
       });
@@ -40,10 +43,10 @@ const LoginPage = () => {
       return;
     }
   };
-  const handleLoginKakao = async e => {
+  const handleLoginKakao = async (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
     e.preventDefault();
     try {
-      const { data, error } = await supabaseClient.auth.signInWithOAuth({
+      const { error } = await supabaseClient.auth.signInWithOAuth({
         provider: 'kakao',
       });
       if (error) console.error(error);
@@ -68,7 +71,6 @@ const LoginPage = () => {
         <div>
           <Input
             id="userEmail"
-            name="userEmail"
             type="text"
             onFocus={() => clearErrors('login')}
             placeholder="이메일을 입력해주세요"
@@ -79,6 +81,7 @@ const LoginPage = () => {
                 message: '이메일 형식으로 작성해주실래요?',
               },
             })}
+            name="userEmail"
           />
           {errors.userEmail && (
             <ValidateMessage>{errors.userEmail.message}</ValidateMessage>
@@ -87,13 +90,13 @@ const LoginPage = () => {
         <div>
           <Input
             id="userPW"
-            name="userPW"
             type="password"
             onFocus={() => clearErrors('login')}
             placeholder="비밀번호를 입력해주세요"
             {...register('userPW', {
               required: '비밀번호를 입력하세요',
             })}
+            name="userPW"
           />
 
           {errors.userPW && (

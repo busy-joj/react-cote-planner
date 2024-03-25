@@ -1,7 +1,8 @@
-import React from 'react';
+import IDefaultProps from '@/types/common/props';
 import { Link } from 'react-router-dom';
 
-const SignLayout = ({ children }) => {
+const SignLayout = (props:IDefaultProps) => {
+  const {children} = props
   return (
     <section className="bg-gray-50 dark:bg-gray-900">
       <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto h-screen lg:py-0">

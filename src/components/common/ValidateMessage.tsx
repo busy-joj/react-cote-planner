@@ -1,8 +1,9 @@
-import React from 'react';
 import { cn } from '@/utils/cn';
+import IDefaultProps from '@/types/common/props';
 
-const ValidateMessage = props => {
-  const { className, children } = props;
+
+const ValidateMessage = (props:IDefaultProps) => {
+  const { className="", children } = props;
 
   return (
     <p
