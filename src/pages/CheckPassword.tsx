@@ -1,24 +1,33 @@
-import React, { useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { supabaseClient } from '../supabase/client';
-import SignLayout from '../components/SignLayout';
-import ValidateMessage from '../components/common/ValidateMessage';
-import Input, { Label, LabelInput } from '../components/common/Input';
-import { SubmitButton } from '../components/common/Button';
+import { useEffect, useState } from 'react';
+import { useForm, SubmitHandler } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
+
+import { SubmitButton } from '../components/common/Button';
+import Input, { LabelInput } from '../components/common/Input';
 import Spinner from '../components/common/Spinner';
+import ValidateMessage from '../components/common/ValidateMessage';
+import SignLayout from '../components/SignLayout';
+import { supabaseClient } from '../supabase/client';
+import { AuthChangeEvent } from '@supabase/supabase-js';
+
+interface IFormValues {
+  email:string,
+  pw:string,
+  confirmPw:string
+}
 
 const CheckPassword = () => {
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState<Boolean>(false);
+  const [isAuthenticated, setIsAuthenticated] = useState<Boolean>(false);
   const {
     register,
     formState: { errors },
     getValues,
     handleSubmit,
-  } = useForm({ mode: 'onChange' });
-  const onSubmitResetPassword = async data => {
+  } = useForm<IFormValues>({ mode: 'onChange' });
+
+  const onSubmitResetPassword:SubmitHandler<IFormValues> = async data => {
     const { email } = data;
     setIsLoading(true);
     try {
@@ -37,7 +46,8 @@ const CheckPassword = () => {
       console.error(error);
     }
   };
-  const onSubmitUpdatePassword = async data => {
+
+  const onSubmitUpdatePassword:SubmitHandler<IFormValues> = async data => {
     const { pw } = data;
     setIsLoading(true);
     try {
@@ -54,9 +64,10 @@ const CheckPassword = () => {
       console.error(error);
     }
   };
+  
   useEffect(() => {
     const { data: listener } = supabaseClient.auth.onAuthStateChange(
-      async (event, session) => {
+      async (event: AuthChangeEvent) => {
         if (event == 'PASSWORD_RECOVERY') {
           setIsAuthenticated(true);
         }
@@ -83,7 +94,6 @@ const CheckPassword = () => {
             </p>
             <Input
               id="email"
-              name="email"
               type="email"
               placeholder="name@company.com"
               {...register('email', {
@@ -93,6 +103,7 @@ const CheckPassword = () => {
                   message: '이메일 형식으로 작성해주실래요?',
                 },
               })}
+              name="email"
             />
             {errors.email && (
               <ValidateMessage>{errors.email.message}</ValidateMessage>
@@ -119,7 +130,6 @@ const CheckPassword = () => {
             <div>
               <LabelInput
                 id="password"
-                name="password"
                 type="password"
                 placeholder="••••••••••"
                 {...register('pw', {
@@ -128,16 +138,17 @@ const CheckPassword = () => {
                     checkMinLength: value => {
                       return (
                         value.length > 8 || '비밀번호는 8자 이상이어야 해요!'
-                      );
-                    },
-                    checkInclude: value => {
-                      const reg = '^(?=.*[@$!%*#?&]).{1,}$';
-                      return value.match(reg)
+                        );
+                      },
+                      checkInclude: value => {
+                        const reg = '^(?=.*[@$!%*#?&]).{1,}$';
+                        return value.match(reg)
                         ? true
                         : '하나 이상의 특수문자가 포함되어야 해요';
+                      },
                     },
-                  },
-                })}
+                  })}
+                  name="password"
               >
                 비밀번호
               </LabelInput>
@@ -148,20 +159,20 @@ const CheckPassword = () => {
             <div className="pt-6">
               <LabelInput
                 id="confirm-password"
-                name="confirm-password"
                 type="password"
                 placeholder="••••••••••"
                 {...register('confirmPw', {
-                  require: '비밀번호를 확인하세요',
+                  required: '비밀번호를 확인하세요',
                   validate: {
                     matchPassword: value => {
                       const { pw } = getValues();
                       return (
                         pw === value || '비밀번호가 달라요! 확인해 보시겠어요?'
-                      );
+                        );
+                      },
                     },
-                  },
-                })}
+                  })}
+                  name="confirm-password"
               >
                 비밀번호 확인
               </LabelInput>

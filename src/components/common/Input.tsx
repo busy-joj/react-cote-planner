@@ -6,7 +6,7 @@ interface IInputProp extends IDefaultProps {
   id: string,
   name: string,
   type: HTMLInputTypeAttribute,
-  onFocus:() => void,
+  onFocus?:() => void,
   placeholder: string
 }
 
