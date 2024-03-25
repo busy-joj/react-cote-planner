@@ -1,32 +1,36 @@
-import { userStore } from '../store';
-import { Link } from 'react-router-dom';
-import { useParams } from 'react-router-dom';
-import DonutChart from './DonutChart';
-import { LoadingButton } from '@/components/common/Button';
-import fetchAchievement from '@/apis/fetchAchievement';
-import { supabaseClient } from '../supabase/client';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import Refresh from '@/assets/refresh.svg?react';
+import { Link, Params } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
+
+import fetchAchievement from '@/apis/fetchAchievement';
 import DefaultUser from '@/assets/defaultUser.svg?react';
-import Spinner from './common/Spinner';
+import Refresh from '@/assets/refresh.svg?react';
+import { LoadingButton } from '@/components/common/Button';
 import { fromNow } from '@/utils/contribution';
+
+import { userStore } from '../store';
+import { supabaseClient } from '../supabase/client';
+import DonutChart from './DonutChart';
+import { IBaekjoonTable } from '@/types/common/supabase';
+import { ResponseData } from '@/types/common/response';
+import { ICustomBaekjoonCrawlingData } from '@/types/common/baekjoon';
 
 const ProfileCard = () => {
   const { userInfo } = userStore();
-  const params = useParams();
+  const params = useParams() as {id : string};
 
   const queryClient = useQueryClient();
   const { mutate, isPending } = useMutation({
-    mutationFn: async baekjoonId => await fetchAchievement(baekjoonId),
+    mutationFn: async (baekjoonId: string): Promise<ResponseData<ICustomBaekjoonCrawlingData[]>> => await fetchAchievement(baekjoonId),
     mutationKey: ['update', 'crawling', params.id],
   });
-  const { data: baekjoonData, refetch } = useQuery({
+  const { data: baekjoonData } = useQuery({
     queryKey: ['solved', params.id],
     queryFn: async () =>
       await supabaseClient.from('baekjoon').select('*').eq('id', params.id),
     enabled: false,
   });
-  const data = baekjoonData?.data?.[0];
+  const data: IBaekjoonTable = baekjoonData?.data?.[0];
   const updated_at = data?.updated_at;
   const solved_day = data?.solved_day;
   const solved_total_count = data?.solved_total_count;
@@ -51,12 +55,12 @@ const ProfileCard = () => {
         </picture>
         <div className="">
           <h2 className="font-bold lg:text-3xl text-md my-3">
-            {params.id || userInfo.user_name}
+            {params.id || userInfo?.user_name}
           </h2>
           <div className="flex items-center gap-2 mb-4">
             <LoadingButton
               isPending={isPending || !updated_at}
-              onClick={e =>
+              onClick={() =>
                 mutate(params.id, {
                   onSuccess: async res => {
                     const crawlingData = res.data[0];
@@ -78,7 +82,6 @@ const ProfileCard = () => {
                         },
                       ])
                       .eq('id', params.id);
-                    // refetch();
                   },
                 })
               }

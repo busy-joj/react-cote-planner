@@ -1,16 +1,18 @@
-import { useEffect, useState } from 'react';
-import { groupByDays } from '@/utils/contribution';
 import {
+  useIsMutating,
   useMutation,
   useQueryClient,
   useSuspenseQuery,
-  useIsMutating,
 } from '@tanstack/react-query';
-import { supabaseClient } from '../supabase/client';
-import { isOneDayPassed } from '../utils/contribution';
+import { useEffect, useState } from 'react';
+
+import { checkSolvedTime } from '@/apis/crawling/backjoon';
 import fetchAchievement from '@/apis/fetchAchievement';
 import Skeleton from '@/components/Skeleton';
-import { checkSolvedTime } from '@/apis/crawling/backjoon';
+import { groupByDays } from '@/utils/contribution';
+
+import { supabaseClient } from '../supabase/client';
+import { isOneDayPassed } from '../utils/contribution';
 
 const ActivityLoading = () => {
   return (
