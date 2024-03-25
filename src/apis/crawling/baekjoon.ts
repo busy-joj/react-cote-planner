@@ -1,26 +1,23 @@
 import { compareAsc, differenceInDays, formatISO } from 'date-fns';
 import { getAllActivities, getLevel } from '@/utils/contribution';
+import { ISolvedProblem, ICustomSolvedProblem } from '@/types/common/baekjoon';
+import { I365DateType } from '@/types/contribution';
 /**
  * 같은 언어와 같은 문제 번호일 때, 문제를 푼 시간이 여러개일 경우
  * solvedTime으로 모아주는 역할
- * @param {[
- *  "problemNum": string,
- *  "problemLink": string,
- *  "language": string,
- *  "solvedTime": string
- * ]} data 외부에서 크롤링한 solved_problem
+ * @param {} data 외부에서 크롤링한 solved_problem
  * @returns {
  *  solved_problem: 해결한 문제 리스트(solvedTime에 동일한 문제를 다른 날에 푼 경우 배열로 담겨있음),
  *  review_count: 복습한 문제 개수(선정 기준은 solvedTime안에 값이 2개 이상일 경우 복습한걸로 간주),
  *  solved_day: 1년동안 코테 문제 푼 일수,
  * }
  */
-export const getBackjoonSolvedData = data => {
+export const getBaekjoonSolvedData = (data: ISolvedProblem[]) => {
   let reviewCount = 0;
   const solvedDays = new Set();
-  const newData = data.reduce((acc, cur) => {
+  const newData: ICustomSolvedProblem[] = data.reduce((acc: ICustomSolvedProblem[], cur:ISolvedProblem) => {
     let existingIndex = acc.findIndex(
-      obj => obj.problemNum === cur.problemNum && obj.language === cur.language,
+      (obj:ICustomSolvedProblem) => obj.problemNum === cur.problemNum && obj.language === cur.language,
     );
     if (existingIndex >= 0) {
       acc[existingIndex].solvedTime.push(cur.solvedTime);
@@ -43,7 +40,7 @@ export const getBackjoonSolvedData = data => {
     }
     return acc;
   }, []);
-  const solvedProblem = Object.values(newData);
+  const solvedProblem: ICustomSolvedProblem[] = Object.values(newData);
   const { solved_day } = checkSolvedTime(getAllActivities(), solvedProblem);
   return {
     solved_problem: solvedProblem,
@@ -60,68 +57,58 @@ export const getBackjoonSolvedData = data => {
  * @returns {
  *   dataActivities: 365일에 코테를 푼 날에 가중치와 Level을 설정한 배열,
  *   solved_day: 중복날짜 제거하고 실제 푼 날의 일수,
- *   newdayActivity: ,
  * }
  */
-export const checkSolvedTime = (oneYearFromNowArr, fetchSolvedProblem) => {
-  const solvedDays = new Set();
-  const newdayActivity = [];
+export const checkSolvedTime = (oneYearFromNowArr:I365DateType[], fetchSolvedProblem: ICustomSolvedProblem[]) => {
+  const solvedDays = new Set<string>();
   if (
-    newdayActivity.length ||
     !Array.isArray(oneYearFromNowArr) ||
     !Array.isArray(fetchSolvedProblem)
   ) {
-    return oneYearFromNowArr; // 유효하지 않은 경우, 원래 배열 반환
+    return {
+      dataActivities: oneYearFromNowArr,
+      solved_day: solvedDays.size
+    }; // 유효하지 않은 경우, 원래 배열 반환
   }
 
   const oneYearFromNowArrLen = oneYearFromNowArr.length;
   const fetchSolvedProblemLen = fetchSolvedProblem.length;
   for (let i = 0; i < oneYearFromNowArrLen; i++) {
+    const currentDate = oneYearFromNowArr[i];
     for (let k = 0; k < fetchSolvedProblemLen; k++) {
-      if (
-        typeof oneYearFromNowArr[i] === 'object' &&
-        oneYearFromNowArr[i].hasOwnProperty('date')
-      ) {
-        const date = oneYearFromNowArr[i].date;
-        const solvedTimeArray = fetchSolvedProblem[k].solvedTime;
-        solvedTimeArray.sort(compareAsc);
-        const solvedTime = formatISO(fetchSolvedProblem[k].solvedTime[0], {
-          representation: 'date',
-        });
+        if (currentDate && currentDate.hasOwnProperty('date')) {
+          const date: string = currentDate.date;
+          const solvedTimeArray: string[] = fetchSolvedProblem[k].solvedTime;
+          solvedTimeArray.sort(compareAsc);
+          const solvedTime: string = formatISO(fetchSolvedProblem[k].solvedTime[0], {
+            representation: 'date',
+          });
 
-        if (date == solvedTime) {
-          oneYearFromNowArr[i].count++;
-          oneYearFromNowArr[i].level = getLevel(oneYearFromNowArr[i].count);
-          const daysSinceProblemSolved = differenceInDays(
-            new Date(),
-            solvedTime,
-          );
-          solvedDays.add(solvedTime);
+          if (date == solvedTime) {
+            currentDate.count++;
+            currentDate.level = getLevel(currentDate.count);
+            const daysSinceProblemSolved = differenceInDays(
+              new Date(),
+              solvedTime,
+            );
+            solvedDays.add(solvedTime);
 
-          oneYearFromNowArr[i].overdue = daysSinceProblemSolved;
-          if (solvedTimeArray.length > 1) {
-            oneYearFromNowArr[i].againCount++;
-            oneYearFromNowArr[i].againLevel = getLevel(
-              oneYearFromNowArr[i].againCount,
-            );
-            const daysSinceAgainSolved = differenceInDays(
-              solvedTimeArray[1],
-              solvedTimeArray[0],
-            );
+            currentDate.overdue = daysSinceProblemSolved;
+            if (solvedTimeArray.length > 1) {
+              currentDate.againCount++;
+              currentDate.againLevel = getLevel(
+                currentDate.againCount,
+              );
+            }
           }
         }
-      }
     }
-    if (
-      oneYearFromNowArr[i] &&
-      oneYearFromNowArr[i].againCount === oneYearFromNowArr[i].count
-    ) {
-      oneYearFromNowArr[i].again = true;
+    if (currentDate && currentDate.againCount === currentDate.count) {
+      currentDate.again = true;
     }
   }
   return {
     dataActivities: oneYearFromNowArr,
-    solved_day: solvedDays.size,
-    newdayActivity: newdayActivity,
+    solved_day: solvedDays.size
   };
 };
