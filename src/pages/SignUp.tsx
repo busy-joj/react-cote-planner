@@ -1,26 +1,41 @@
 import React, { useState, useRef } from 'react';
-import { useForm } from 'react-hook-form';
+import { SubmitHandler, useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
 
-import { supabaseClient } from '../supabase/client';
+import { supabaseClient } from '@/supabase/client';
 
-import SignLayout from '../components/SignLayout';
-import Spinner from '../components/common/Spinner';
-import ValidateMessage from '../components/common/ValidateMessage';
-import Button, { SubmitButton } from '../components/common/Button';
-import Input, { LabelInput, Label } from '../components/common/Input';
+import SignLayout from '@/components/SignLayout';
+import Spinner from '@/components/common/Spinner';
+import ValidateMessage from '@/components/common/ValidateMessage';
+import Button, { SubmitButton } from '@/components/common/Button';
+import Input, { LabelInput, Label } from '@/components/common/Input';
 import { useQueryClient } from '@tanstack/react-query';
 import fetchUserCheck from '@/apis/fetchUserCheck';
 
+interface IBaekjoonValidation {
+  isLoading: boolean;
+  checked: boolean;
+  text: string;
+}
+
+interface IFormValues {
+  email: string;
+  username: string;
+  baekjoonID: string;
+  pw: string;
+  confirmPw: string;
+}
+
 const SignUpPage = () => {
   const navigate = useNavigate();
-  const checkChangeRef = useRef(null);
-  const [isLoadingSignup, setIsLoadingSignup] = useState(false);
-  const [baekjoonValidation, setBaekjoonValidation] = useState({
-    isLoading: false,
-    checked: false,
-    text: '인증',
-  });
+  const checkChangeRef = useRef<string | null>(null);
+  const [isLoadingSignup, setIsLoadingSignup] = useState<boolean>(false);
+  const [baekjoonValidation, setBaekjoonValidation] =
+    useState<IBaekjoonValidation>({
+      isLoading: false,
+      checked: false,
+      text: '인증',
+    });
 
   const queryClient = useQueryClient();
 
@@ -31,8 +46,8 @@ const SignUpPage = () => {
     setFocus,
     setError,
     handleSubmit,
-  } = useForm({ mode: 'onChange' });
-  const onSubmit = data => {
+  } = useForm<IFormValues>({ mode: 'onChange' });
+  const onSubmit: SubmitHandler<IFormValues> = data => {
     // 백준ID 인증 안했을 경우
     if (!baekjoonValidation.checked) {
       setFocus('baekjoonID');
@@ -55,7 +70,9 @@ const SignUpPage = () => {
     HandleSignUp(data);
   };
 
-  const handleBaekjoonValidation = async e => {
+  const handleBaekjoonValidation = async (
+    e: React.MouseEvent<HTMLElement, MouseEvent>,
+  ) => {
     e.preventDefault();
     const baekjoonID = getValues('baekjoonID');
     checkChangeRef.current = baekjoonID;
@@ -85,11 +102,11 @@ const SignUpPage = () => {
     }
   };
 
-  const HandleSignUp = async inputData => {
+  const HandleSignUp = async (inputData: IFormValues) => {
     const { email, pw, username, baekjoonID } = inputData;
     setIsLoadingSignup(true);
     try {
-      const { data, error } = await supabaseClient.auth.signUp({
+      const { error } = await supabaseClient.auth.signUp({
         email: email,
         password: pw,
         options: {
@@ -118,18 +135,17 @@ const SignUpPage = () => {
         <div>
           <LabelInput
             id="email"
-            name="email"
             type="email"
             placeholder="name@company.com"
             {...register('email', {
               required: '이메일을 입력해주세요',
               onBlur: async e => {
-                const { data: profiles, error } = await supabaseClient
+                const { data: profiles } = await supabaseClient
                   .from('profiles')
                   .select('email')
                   .eq('email', e.target.value);
                 return (
-                  profiles.length > 0 &&
+                  profiles!.length > 0 &&
                   setError('email', {
                     type: 'emailCheckDuplication',
                     message: '이미 가입된 이메일 입니다.',
@@ -141,6 +157,7 @@ const SignUpPage = () => {
                 message: '이메일 형식으로 작성해주실래요?',
               },
             })}
+            name="email"
           >
             이메일
           </LabelInput>
@@ -151,13 +168,13 @@ const SignUpPage = () => {
         <div>
           <LabelInput
             id="username"
-            name="username"
             type="text"
             placeholder="이름을 입력해주세요"
             {...register('username', {
               required: '이름을 입력해주세요',
               maxLength: 20,
             })}
+            name="username"
           >
             이름
           </LabelInput>
@@ -170,7 +187,6 @@ const SignUpPage = () => {
           <div className="flex gap-2">
             <Input
               id="baekjoonID"
-              name="baekjoonID"
               type="text"
               placeholder="BaekjoonID를 입력하세요"
               {...register('baekjoonID', {
@@ -180,16 +196,17 @@ const SignUpPage = () => {
                     ? true
                     : 'baekjoonID를 인증해주세요:)',
               })}
+              name="baekjoonID"
             />
             <Button
               onClick={handleBaekjoonValidation}
-              className={`bg-primary-600 w-1/5 text-white ${
+              className={`w-1/5 bg-primary-600 text-white ${
                 (baekjoonValidation.text === '성공' && 'bg-lime-600') ||
                 (baekjoonValidation.text === '실패' && 'bg-red-600')
               }`}
             >
               {baekjoonValidation.isLoading ? (
-                <Spinner className="w-4 h-4" />
+                <Spinner className="h-4 w-4" />
               ) : (
                 `${baekjoonValidation.text}`
               )}
@@ -202,7 +219,6 @@ const SignUpPage = () => {
         <div>
           <LabelInput
             id="password"
-            name="password"
             type="password"
             placeholder="••••••••••"
             {...register('pw', {
@@ -219,6 +235,7 @@ const SignUpPage = () => {
                 },
               },
             })}
+            name="password"
           >
             비밀번호
           </LabelInput>
@@ -227,11 +244,10 @@ const SignUpPage = () => {
         <div>
           <LabelInput
             id="confirm-password"
-            name="confirm-password"
             type="password"
             placeholder="••••••••••"
             {...register('confirmPw', {
-              require: '비밀번호를 확인하세요',
+              required: '비밀번호를 확인하세요',
               validate: {
                 matchPassword: value => {
                   const { pw } = getValues();
@@ -241,6 +257,7 @@ const SignUpPage = () => {
                 },
               },
             })}
+            name="confirm-password"
           >
             비밀번호 확인
           </LabelInput>
@@ -248,8 +265,8 @@ const SignUpPage = () => {
             <ValidateMessage>{errors.confirmPw.message}</ValidateMessage>
           )}
         </div>
-        <SubmitButton className="w-full text-white bg-primary-600 hover:bg-primary-700">
-          {!isLoadingSignup ? '회원가입' : <Spinner className="w-4 h-4" />}
+        <SubmitButton className="w-full bg-primary-600 text-white hover:bg-primary-700">
+          {!isLoadingSignup ? '회원가입' : <Spinner className="h-4 w-4" />}
         </SubmitButton>
         <p className="text-sm font-light text-gray-500 dark:text-gray-400">
           이미 회원이신가요?{' '}
