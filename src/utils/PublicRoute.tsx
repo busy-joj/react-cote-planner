@@ -1,6 +1,4 @@
-import React from 'react';
-
-import { userStore } from '../store';
+import { userStore } from '@/store';
 import { Navigate, Outlet } from 'react-router-dom';
 
 const PublicRoute = () => {
