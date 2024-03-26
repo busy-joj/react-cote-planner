@@ -1,11 +1,10 @@
-import React from 'react';
 import mainBanner from '@/assets/landing.png';
-import SearchBar from '../components/SearchBar';
+import SearchBar from '@/components/SearchBar';
 
 const HomePage = () => {
   return (
-    <div className="lg:w-[1200px] my-0 mx-auto pt-[60px] flex flex-col h-screen">
-      <div className="text-center py-6  lg:w-4/5 lg:mx-auto">
+    <div className="mx-auto my-0 flex h-screen flex-col pt-[60px] lg:w-[1200px]">
+      <div className="py-6 text-center  lg:mx-auto lg:w-4/5">
         <img src={mainBanner} className="inline-block" alt="" />
         <SearchBar />
       </div>

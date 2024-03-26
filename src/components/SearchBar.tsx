@@ -19,7 +19,6 @@ const SearchBar = () => {
         queryKey: ['userCheck', searchRef.current?.value],
         queryFn: () => fetchUserCheck(searchRef.current?.value || ''),
       });
-      console.log('ddfdf', userInfo);
       if (searchRef.current)
         if (!userInfo || userInfo.baekjoon_id !== searchRef.current.value) {
           queryClient.prefetchQuery({
