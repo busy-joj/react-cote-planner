@@ -1,23 +1,35 @@
 import { create } from 'zustand';
 
-export interface IUserInfo {
-    avatar_url: string
-    email: string
-    email_verified: boolean
-    full_name: string
-    iss: string
-    name: string
-    phone_verified: boolean
-    preferred_username: string
-    provider_id: string
-    sub: string
-    user_name: string
-  }
+export interface IKakaoUserInfo {
+  avatar_url: string;
+  email: string;
+  email_verified: boolean;
+  full_name: string;
+  iss: string;
+  name: string;
+  phone_verified: boolean;
+  preferred_username: string;
+  provider_id: string;
+  sub: string;
+  user_name: string;
+  baekjoon_id?: string;
+}
+
+export interface IEmailUserInfo {
+  baekjoon_id: string;
+  email: string;
+  email_verified: boolean;
+  phone_verified: boolean;
+  sub: string;
+  user_name: string;
+}
+
+export type IUserInfo = IKakaoUserInfo | IEmailUserInfo;
 
 interface IUserStore {
-  userInfo: IUserInfo | null
-  setUserInfo: (data: IUserInfo) => void
-  deleteUserInfo: () => void
+  userInfo: IUserInfo | null;
+  setUserInfo: (data: IUserInfo) => void;
+  deleteUserInfo: () => void;
 }
 
 export const userStore = create<IUserStore>(set => ({
