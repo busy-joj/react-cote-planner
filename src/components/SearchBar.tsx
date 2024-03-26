@@ -15,10 +15,11 @@ const SearchBar = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const checkID = async () => {
-      const { data: code } = await queryClient.fetchQuery({
+      const code = await queryClient.fetchQuery({
         queryKey: ['userCheck', searchRef.current?.value],
         queryFn: () => fetchUserCheck(searchRef.current?.value || ''),
       });
+
       if (searchRef.current)
         if (!userInfo || userInfo.baekjoon_id !== searchRef.current.value) {
           queryClient.prefetchQuery({

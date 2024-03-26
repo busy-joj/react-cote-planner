@@ -16,6 +16,7 @@ export interface IKakaoUserInfo {
 }
 
 export interface IEmailUserInfo {
+  avatar_url?: string;
   baekjoon_id: string;
   email: string;
   email_verified: boolean;
