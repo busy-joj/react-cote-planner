@@ -1,3 +1,4 @@
+import { UserMetadata } from '@supabase/supabase-js';
 import { create } from 'zustand';
 
 export interface IKakaoUserInfo {
@@ -25,7 +26,7 @@ export interface IEmailUserInfo {
   user_name: string;
 }
 
-export type IUserInfo = IKakaoUserInfo | IEmailUserInfo;
+export type IUserInfo = IKakaoUserInfo | IEmailUserInfo | UserMetadata;
 
 interface IUserStore {
   userInfo: IUserInfo | null;
