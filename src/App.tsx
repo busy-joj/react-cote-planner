@@ -1,4 +1,3 @@
-// import React from "react";
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { useEffect } from 'react';
@@ -6,18 +5,17 @@ import ReactGA from 'react-ga4';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { Reset } from 'styled-reset';
 
-import Header from './components/Header';
-import CheckPassword from './pages/CheckPassword';
-import Confirm from './pages/Confirm';
-import HomePage from './pages/Home';
-import LoginPage from './pages/Login';
-import NotFound from './pages/NotFound';
-import NotReady from './pages/NotReady';
-import ProfilePage from './pages/Profile';
-import SignUpPage from './pages/SignUp';
-import SignUpConfirm from './pages/SignUpConfirm';
-// import PrivateRoute from './utils/PrivateRoute';
-import PublicRoute from './utils/PublicRoute';
+import Header from '@/components/Header';
+import CheckPassword from '@/pages/CheckPassword';
+import Confirm from '@/pages/Confirm';
+import HomePage from '@/pages/Home';
+import LoginPage from '@/pages/Login';
+import NotFound from '@/pages/NotFound';
+import NotReady from '@/pages/NotReady';
+import ProfilePage from '@/pages/Profile';
+import SignUpPage from '@/pages/SignUp';
+import SignUpConfirm from '@/pages/SignUpConfirm';
+import PublicRoute from '@/utils/PublicRoute';
 
 const queryClient = new QueryClient({
   defaultOptions: {
