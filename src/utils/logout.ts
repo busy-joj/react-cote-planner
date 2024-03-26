@@ -1,6 +1,11 @@
 import { supabaseClient } from '@/supabase/client';
+import { NavigateFunction } from 'react-router-dom';
 
-export const handleLogOut = async (e, deleteUserInfo, navigate) => {
+export const handleLogOut = async (
+  e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+  deleteUserInfo: () => void,
+  navigate: NavigateFunction,
+) => {
   e.preventDefault();
   try {
     const { error } = await supabaseClient.auth.signOut();
