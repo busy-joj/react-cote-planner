@@ -4,7 +4,7 @@ import path from 'path';
 import svgr from 'vite-plugin-svgr';
 import { visualizer } from "rollup-plugin-visualizer";
 
-export default ({mode})=>{
+export default ({mode}:{mode:string})=>{
   return defineConfig ({
       plugins: [
         svgr({
