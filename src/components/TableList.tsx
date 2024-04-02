@@ -1,0 +1,50 @@
+import { supabaseClient } from '@/supabase/client';
+import { IBaekjoonTable } from '@/types/common/supabase';
+import { PostgrestMaybeSingleResponse } from '@supabase/postgrest-js';
+import { useSuspenseQuery } from '@tanstack/react-query';
+import { useSearchParams } from 'react-router-dom';
+
+interface IProps {
+  id: string;
+}
+const TableList = (props: IProps) => {
+  const { id } = props;
+  const { data: baekjoonData } = useSuspenseQuery({
+    queryKey: ['solved', id],
+    queryFn: async (): Promise<
+      PostgrestMaybeSingleResponse<IBaekjoonTable[]>
+    > => await supabaseClient.from('baekjoon').select('*').eq('id', id),
+  });
+  const [searchParams] = useSearchParams();
+  const data = baekjoonData.data?.[0] as IBaekjoonTable;
+  const solvedList = data?.solved_list;
+  const selectDate = searchParams.get('sort');
+  return (
+    <>
+      {selectDate && solvedList ? (
+        solvedList[selectDate].map((problem, index) => (
+          <tr
+            key={index}
+            className="border-b bg-white dark:border-gray-700 dark:bg-gray-800"
+          >
+            <td className="px-6 py-4">
+              <a
+                href="#"
+                className="font-medium text-blue-600 hover:underline dark:text-blue-500"
+              >
+                {problem?.problemNum}
+              </a>
+            </td>
+            <td className="px-6 py-4">{problem?.language}</td>
+            <td className="px-6 py-4">{problem?.solvedTime[0]}</td>
+            <td className="px-6 py-4">{problem?.solvedTime[1]}</td>
+          </tr>
+        ))
+      ) : (
+        <></>
+      )}
+    </>
+  );
+};
+
+export default TableList;
