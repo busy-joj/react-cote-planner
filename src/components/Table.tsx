@@ -1,4 +1,4 @@
-import React, { Suspense } from 'react';
+import { Suspense } from 'react';
 import Skeleton from '@/components/Skeleton';
 import TableList from '@/components/TableList';
 
