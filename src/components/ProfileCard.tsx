@@ -18,17 +18,21 @@ import { PostgrestMaybeSingleResponse } from '@supabase/supabase-js';
 
 const ProfileCard = () => {
   const { userInfo } = userStore();
-  const params = useParams() as {id : string};
+  const params = useParams() as { id: string };
 
   const queryClient = useQueryClient();
   const { mutate, isPending } = useMutation({
-    mutationFn: async (baekjoonId: string): Promise<ResponseData<ICustomBaekjoonCrawlingData[]>> => await fetchAchievement(baekjoonId),
+    mutationFn: async (
+      baekjoonId: string,
+    ): Promise<ResponseData<ICustomBaekjoonCrawlingData[]>> =>
+      await fetchAchievement(baekjoonId),
     mutationKey: ['update', 'crawling', params.id],
   });
   const { data: baekjoonData } = useQuery({
     queryKey: ['solved', params.id],
-    queryFn: async (): Promise<PostgrestMaybeSingleResponse<IBaekjoonTable[]>> =>
-      await supabaseClient.from('baekjoon').select('*').eq('id', params.id),
+    queryFn: async (): Promise<
+      PostgrestMaybeSingleResponse<IBaekjoonTable[]>
+    > => await supabaseClient.from('baekjoon').select('*').eq('id', params.id),
     enabled: false,
   });
   const data = baekjoonData?.data?.[0] as IBaekjoonTable;
@@ -38,26 +42,26 @@ const ProfileCard = () => {
   const review_count = data?.review_count;
   const review_ratio = Math.floor((review_count / solved_total_count) * 100);
   return (
-    <section className="grid grid-rows-2 grid-cols-2 gap-2 lg:gap-4 lg:grid-rows-1 lg:grid-cols-3">
+    <section className="grid grid-cols-2 grid-rows-2 gap-2 lg:grid-cols-3 lg:grid-rows-1 lg:gap-4">
       <article className="col-start-1 col-end-3 lg:col-start-1 lg:col-end-2">
         <picture>
           {userInfo?.avatar_url ? (
             <img
               src={userInfo?.avatar_url}
               alt="프로필 사진"
-              className="rounded-full object-contain max-h-[100px] bg-gray-300"
+              className="max-h-[100px] rounded-full bg-gray-300 object-contain"
             />
           ) : (
-            <div className="lg:w-[100px] lg:h-[100px] w-[70px] h-[70px] bg-gray-300 rounded-full">
+            <div className="h-[70px] w-[70px] rounded-full bg-gray-300 lg:h-[100px] lg:w-[100px]">
               <DefaultUser />
             </div>
           )}
         </picture>
         <div className="">
-          <h2 className="font-bold lg:text-3xl text-md my-3">
+          <h2 className="text-md my-3 font-bold lg:text-3xl">
             {params.id || userInfo?.user_name}
           </h2>
-          <div className="flex items-center gap-2 mb-4">
+          <div className="mb-4 flex items-center gap-2">
             <LoadingButton
               isPending={isPending || !updated_at}
               onClick={() =>
@@ -70,22 +74,12 @@ const ProfileCard = () => {
                     );
                     await supabaseClient
                       .from('baekjoon')
-                      .update([
-                        {
-                          solved_problem: crawlingData.solved_problem,
-                          solved_count: crawlingData.solved_count,
-                          solved_recent: crawlingData.solved_recent,
-                          solved_total_count: crawlingData.solved_total_count,
-                          solved_day: crawlingData.solved_day,
-                          review_count: crawlingData.review_count,
-                          updated_at: crawlingData.updated_at,
-                        },
-                      ])
+                      .update([crawlingData])
                       .eq('id', params.id);
                   },
                 })
               }
-              className={`bg-primary-600 lg:w-10 lg:h-8 w-8 h-6 text-white lg:py-2 py-1`}
+              className={`h-6 w-8 bg-primary-600 py-1 text-white lg:h-8 lg:w-10 lg:py-2`}
             >
               <Refresh />
             </LoadingButton>
@@ -97,7 +91,7 @@ const ProfileCard = () => {
             </div>
           </div>
           {userInfo?.user_name ? null : (
-            <div className="border border-solid rounded-lg lg:rounded-xl p-2 lg:p-3.5 text-sm lg:text-base border-gray-300 w-full">
+            <div className="w-full rounded-lg border border-solid border-gray-300 p-2 text-sm lg:rounded-xl lg:p-3.5 lg:text-base">
               <Link to="/login">
                 🔔 카카오 연동하고 나만의 PT를 받아보세요.
               </Link>
@@ -105,15 +99,15 @@ const ProfileCard = () => {
           )}
         </div>
       </article>
-      <article className="col-start-1 col-end-2 bg-profileCard-study rounded-lg lg:rounded-xl font-bold text-white p-3 lg:p-8 flex flex-col lg:col-start-2 lg:col-end-3">
+      <article className="col-start-1 col-end-2 flex flex-col rounded-lg bg-profileCard-study p-3 font-bold text-white lg:col-start-2 lg:col-end-3 lg:rounded-xl lg:p-8">
         <p className="text-base lg:text-lg">학습일</p>
-        <div className="flex justify-center items-center h-full text-lg lg:text-3xl">
+        <div className="flex h-full items-center justify-center text-lg lg:text-3xl">
           {solved_day || '-'}일 / 365일
         </div>
       </article>
-      <article className="col-start-2 col-end-3 bg-profileCard-review rounded-lg lg:rounded-xl font-bold text-white p-3 lg:p-8 flex flex-col lg:col-start-3 lg:col-end-4">
+      <article className="col-start-2 col-end-3 flex flex-col rounded-lg bg-profileCard-review p-3 font-bold text-white lg:col-start-3 lg:col-end-4 lg:rounded-xl lg:p-8">
         <p className="text-base lg:text-lg">복습력</p>
-        <div className="flex justify-around items-center h-full flex-col md:flex-row gap-1">
+        <div className="flex h-full flex-col items-center justify-around gap-1 md:flex-row">
           <DonutChart
             width={100}
             height={100}

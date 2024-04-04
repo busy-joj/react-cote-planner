@@ -12,32 +12,37 @@ const SearchBar = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent, baekjoonId: string) => {
     e.preventDefault();
+    if (baekjoonId === '') return;
+
     const checkID = async () => {
       const code = await queryClient.fetchQuery({
-        queryKey: ['userCheck', searchRef.current?.value],
-        queryFn: () => fetchUserCheck(searchRef.current?.value || ''),
+        queryKey: ['userCheck', baekjoonId],
+        queryFn: () => fetchUserCheck(baekjoonId),
       });
 
       if (searchRef.current)
         if (!userInfo || userInfo.baekjoon_id !== searchRef.current.value) {
           queryClient.prefetchQuery({
             queryKey: ['solved', searchRef.current.value],
-            queryFn: () => fetchAchievement(searchRef.current?.value || ''),
+            queryFn: () => fetchAchievement(baekjoonId),
           });
         }
 
       if (code === 404 || code === 403 || code === 401 || code === 402) {
         alert('ID를 정확히 입력하세요');
       } else if (code === 200) {
-        navigate(`/profile/${searchRef.current?.value}`);
+        navigate(`/profile/${baekjoonId}`);
       }
     };
     checkID();
   };
   return (
-    <form onSubmit={handleSubmit} className="px-3 py-4 lg:px-0">
+    <form
+      onSubmit={e => handleSubmit(e, searchRef.current?.value || '')}
+      className="px-3 py-4 lg:px-0"
+    >
       <label
         htmlFor="default-search"
         className="sr-only mb-2 text-sm font-medium text-gray-900 dark:text-white"
