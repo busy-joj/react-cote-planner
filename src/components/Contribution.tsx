@@ -1,4 +1,4 @@
-import { Suspense, useRef } from 'react';
+import { Suspense } from 'react';
 import { DEFAULT_MONTH_LABELS } from '@/assets/constants';
 import {
   getAllActivities,
@@ -32,10 +32,8 @@ const Contribution = ({ params }: IProps) => {
   const allActivities = getAllActivities();
   const weeks = groupDatesByWeeks(allActivities);
   const monthLabel = getMonthLabels(weeks, DEFAULT_MONTH_LABELS);
-  const tableRef = useRef(null);
   const [searchParams, setSearchParams] = useSearchParams();
 
-  console.log(tableRef.current);
   return (
     <div className="relative py-8">
       <h2 className="mb-3 text-base font-bold lg:text-xl">Activities</h2>
@@ -63,7 +61,6 @@ const Contribution = ({ params }: IProps) => {
               e: React.MouseEvent<HTMLTableSectionElement, MouseEvent>,
             ) => {
               const target = e.target as HTMLElement; // HTMLElement로 타입 단언
-              console.log(target.dataset.date);
               searchParams.set('sort', target.dataset.date || '');
               setSearchParams(searchParams);
             }}
