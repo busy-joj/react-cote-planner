@@ -154,7 +154,7 @@ const NewdayActivity = (props: IProps) => {
                       : activityBgColor['bad'][activity?.level || 0]
                   }`} group relative justify-self-center rounded-br-full rounded-tl-full after:absolute after:left-[29%] after:top-[9%] after:rotate-[30deg] after:font-thin after:content-['|'] md:after:left-[30%] md:after:top-[10%] md:after:rotate-[45deg]`}
                 >
-                  <span className="absolute z-10 ml-2 hidden w-max origin-center translate-x-[-50%] translate-y-[-130%] cursor-default rounded-md bg-slate-950 px-2 py-1 text-center text-xs text-white before:absolute before:left-[50%] before:top-[100%] before:inline-block before:h-2 before:w-2 before:origin-center before:translate-x-[-50%] before:translate-y-[-50%] before:rotate-45 before:bg-slate-950 before:content-[''] group-hover:inline-block">
+                  <span className="absolute z-10 ml-2 hidden w-max origin-center translate-x-[-50%] translate-y-[-130%] cursor-default rounded-md  bg-slate-950 px-2 py-1 text-center text-xs text-white before:absolute before:left-[50%] before:top-[100%] before:inline-block before:h-2 before:w-2 before:origin-center before:translate-x-[-50%] before:translate-y-[-50%] before:rotate-45 before:bg-slate-950 before:content-[''] group-hover:inline-block">
                     {activity?.date}
                     <br />
                     {activity?.count == 0
