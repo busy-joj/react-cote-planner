@@ -1,4 +1,4 @@
-import { Suspense } from 'react';
+import { Suspense, useState } from 'react';
 import { DEFAULT_MONTH_LABELS } from '@/assets/constants';
 import {
   getAllActivities,
@@ -6,6 +6,7 @@ import {
   groupDatesByWeeks,
 } from '@/utils/contribution';
 import NewdayActivity from '@/components/NewdayActivity';
+import IconHelp from '@/assets/icon_help.svg?react';
 import Skeleton from '@/components/Skeleton';
 import Table from '@/components/Table';
 import { useSearchParams } from 'react-router-dom';
@@ -29,6 +30,7 @@ interface IProps {
 }
 
 const Contribution = ({ params }: IProps) => {
+  const [showHelp, setShowHelp] = useState(false);
   const allActivities = getAllActivities();
   const weeks = groupDatesByWeeks(allActivities);
   const monthLabel = getMonthLabels(weeks, DEFAULT_MONTH_LABELS);
@@ -36,8 +38,31 @@ const Contribution = ({ params }: IProps) => {
 
   return (
     <div className="relative py-8">
-      <h2 className="mb-3 text-base font-bold lg:text-xl">Activities</h2>
-      <div className="overflow-x-scroll p-4 shadow-md sm:rounded-lg lg:overflow-auto lg:p-8">
+      <div className="mb-3 flex items-end gap-1 text-base">
+        <h2 className="text-lg font-bold lg:text-xl">Activities</h2>
+        <div
+          className="group sm:relative"
+          onMouseOver={(): void => setShowHelp(true)}
+          onMouseOut={(): void => setShowHelp(false)}
+        >
+          <button className="relative top-[1px]">
+            <IconHelp className="h-4 w-4 opacity-50 group-hover:opacity-100" />
+            <span className="blind">도움말</span>
+          </button>
+          {showHelp && (
+            <ul className="left absolute left-0 z-10 flex w-[100%] flex-col rounded-md border-[1px] border-solid bg-white py-1 pl-5 pr-2 text-center text-xs leading-5 sm:w-[382px]">
+              <li className="list-disc text-left">
+                코테PT는 학습보다 복습에 주안점을 두기 때문에 학습을 했지만
+                복습을 하지 않았을 경우에는 잔디가 시들게 됩니다.
+              </li>
+              <li className="list-disc text-left">
+                학습 후 같은 문제를 풀어 복습하게 되면 잔디가 푸르게 바뀝니다.
+              </li>
+            </ul>
+          )}
+        </div>
+      </div>
+      <div className="overflow-x-scroll p-8 shadow-md sm:rounded-lg lg:overflow-auto">
         <table className="w-max border-separate border-spacing-1 lg:w-full">
           <thead className="text-xs text-gray-700">
             <tr>

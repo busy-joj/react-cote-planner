@@ -35,7 +35,7 @@ const Table = (props: IProps) => {
       {' '}
       <div className="relative overflow-x-auto py-3 shadow-md sm:rounded-lg">
         <table className="w-full text-left text-sm text-gray-500 rtl:text-right dark:text-gray-400">
-          <caption className="bg-white p-5 text-left text-lg font-semibold text-gray-900 rtl:text-right dark:bg-gray-800 dark:text-white">
+          <caption className="bg-white p-5 text-left text-lg font-semibold text-gray-900 lg:text-xl rtl:text-right dark:bg-gray-800 dark:text-white">
             BAEJOON
           </caption>
           <thead className="bg-gray-50 text-xs uppercase text-gray-700 dark:bg-gray-700 dark:text-gray-400">
