@@ -1,3 +1,4 @@
+/// <reference types="vitest" />
 import { defineConfig, type PluginOption } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
@@ -22,6 +23,11 @@ export default ({mode}:{mode:string})=>{
           filename: "analyze.html", // will be saved in project's root
         }) as PluginOption : [],
       ],
+      test: {
+        globals: true,
+        environment: 'jsdom',
+        setupFiles: './src/test/setup.ts',
+      },
       resolve: {
         alias: [
           { find:'@', replacement:path.resolve(__dirname, './src')},
