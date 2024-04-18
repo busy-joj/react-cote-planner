@@ -1,7 +1,6 @@
 import { defaultInstance } from '@/apis';
+import { ResponseCode } from '@/types/common/response';
 import { AxiosResponse } from 'axios';
-
-type ResponseCode = 200 | 404 | 403 | 401 | 402;
 
 const fetchUserCheck = (baekjoonID: string) =>
   defaultInstance
