@@ -9,11 +9,7 @@
     "build": "tsc && vite build",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
-    "analyze": "vite build --mode analyze",
-    "test": "vitest --reporter verbose",
-    "coverage": "vitest --run --coverage --reporter verbose",
-    "test-ui": "vitest --ui --reporter verbose",
-    "test-once": "vitest --run --reporter verbose"
+    "analyze": "vite build --mode analyze"
   },
   "dependencies": {
     "@supabase/auth-helpers-react": "^0.4.2",
@@ -39,8 +35,6 @@
   },
   "devDependencies": {
     "@tanstack/react-query-devtools": "^5.24.6",
-    "@testing-library/jest-dom": "^6.4.2",
-    "@testing-library/react": "^14.2.2",
     "@types/node": "^20.11.29",
     "@types/react": "^18.2.67",
     "@types/react-dom": "^18.2.22",
@@ -48,8 +42,6 @@
     "@typescript-eslint/eslint-plugin": "^7.3.1",
     "@typescript-eslint/parser": "^7.3.1",
     "@vitejs/plugin-react": "^4.2.1",
-    "@vitest/coverage-v8": "^1.4.0",
-    "@vitest/ui": "^1.4.0",
     "autoprefixer": "^10.4.16",
     "css-loader": "^6.8.1",
     "eslint": "^8.55.0",
@@ -58,8 +50,6 @@
     "eslint-plugin-react-refresh": "^0.4.5",
     "eslint-plugin-simple-import-sort": "^12.0.0",
     "eslint-plugin-unused-imports": "^3.1.0",
-    "jsdom": "^24.0.0",
-    "msw": "^2.2.13",
     "postcss": "^8.4.33",
     "postcss-loader": "^7.3.4",
     "prettier": "^3.2.5",
@@ -69,7 +59,6 @@
     "tailwindcss": "^3.4.0",
     "typescript": "^5.4.2",
     "vite": "^5.0.8",
-    "vite-tsconfig-paths": "^4.2.3",
-    "vitest": "^1.4.0"
+    "vite-tsconfig-paths": "^4.2.3"
   }
 }
