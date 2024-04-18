@@ -22,9 +22,9 @@ import { ICustomBaekjoonCrawlingData } from '@/types/common/baekjoon';
 const ActivityLoading = () => {
   return (
     <>
-      <tr className="py-4 relative h-[136px]">
+      <tr className="relative h-[136px] py-4">
         <td>
-          <Skeleton className="absolute w-full h-full rounded" />
+          <Skeleton className="absolute h-full w-full rounded" />
         </td>
       </tr>
     </>
@@ -33,14 +33,14 @@ const ActivityLoading = () => {
 
 interface IActivityBgColor {
   good: {
-    [key: number]: string
-  },
+    [key: number]: string;
+  };
   bad: {
-    [key: number]: string
-  }
+    [key: number]: string;
+  };
 }
 
-const activityBgColor:IActivityBgColor = {
+const activityBgColor: IActivityBgColor = {
   good: {
     0: 'bg-[#F0F0EF] after:text-[#E6E6E6]',
     1: 'bg-[#D0E7D2] after:text-[#B9D8BC]',
@@ -58,27 +58,33 @@ const activityBgColor:IActivityBgColor = {
 };
 
 interface IProps {
-  allActivities: I365DateType[]
+  allActivities: I365DateType[];
   params: {
-    id: string
-  }
+    id: string;
+  };
 }
 
 const NewdayActivity = (props: IProps) => {
   const { allActivities, params } = props;
-  const [newdayActivity, setnewdayActivity] = useState<(I365DateType[] | null)[]>([]);
+  const [newdayActivity, setnewdayActivity] = useState<
+    (I365DateType[] | null)[]
+  >([]);
   const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   const queryClient = useQueryClient();
   const { mutate } = useMutation({
-    mutationFn: async (baekjoonId: string): Promise<ResponseData<ICustomBaekjoonCrawlingData[]>> => await fetchAchievement(baekjoonId),
+    mutationFn: async (
+      baekjoonId: string,
+    ): Promise<ResponseData<ICustomBaekjoonCrawlingData[]>> =>
+      await fetchAchievement(baekjoonId),
   });
   const isMutatingCrawling = useIsMutating({
     mutationKey: ['update', 'crawling', params.id],
   });
   const { data: baekjoonData } = useSuspenseQuery({
     queryKey: ['solved', params.id],
-    queryFn: async (): Promise<PostgrestMaybeSingleResponse<IBaekjoonTable[]>>  =>
-      await supabaseClient.from('baekjoon').select('*').eq('id', params.id),
+    queryFn: async (): Promise<
+      PostgrestMaybeSingleResponse<IBaekjoonTable[]>
+    > => await supabaseClient.from('baekjoon').select('*').eq('id', params.id),
   });
   const data = baekjoonData.data?.[0] as IBaekjoonTable;
   const fetchSolvedProblem = data?.solved_problem;
@@ -87,24 +93,17 @@ const NewdayActivity = (props: IProps) => {
   useEffect(() => {
     // 하루 이상 지나면 데이터 업데이트
     if (data?.updated_at && isOneDayPassed(data?.updated_at)) {
+      console.log('여기인가');
       const updateOneDayPassed = async () => {
         mutate(params.id, {
-          onSuccess: async (res: ResponseData<ICustomBaekjoonCrawlingData[]>) => {
+          onSuccess: async (
+            res: ResponseData<ICustomBaekjoonCrawlingData[]>,
+          ) => {
             const crawlingData: ICustomBaekjoonCrawlingData = res.data[0];
             queryClient.setQueryData(['solved', params.id], crawlingData);
             await supabaseClient
               .from('baekjoon')
-              .update([
-                {
-                  solved_problem: crawlingData.solved_problem,
-                  solved_count: crawlingData.solved_count,
-                  solved_recent: crawlingData.solved_recent,
-                  solved_total_count: crawlingData.solved_total_count,
-                  solved_day: crawlingData.solved_day,
-                  review_count: crawlingData.review_count,
-                  updated_at: crawlingData.updated_at,
-                },
-              ])
+              .update([crawlingData])
               .eq('id', params.id);
             // 하루 지난 데이터가 캐싱되어 있는 상태에서 새로운 데이터를 가져온 후
             // setQueryData를 통해 업데이트해줬지만 화면에서는 동기화가 이루어지지 않음
@@ -120,7 +119,8 @@ const NewdayActivity = (props: IProps) => {
       updateOneDayPassed();
     } else if (!fetchSolvedProblem) {
       const getNewData = async () => {
-        const crawlingData: ResponseData<ICustomBaekjoonCrawlingData[]> = await fetchAchievement(params.id);
+        const crawlingData: ResponseData<ICustomBaekjoonCrawlingData[]> =
+          await fetchAchievement(params.id);
         queryClient.setQueryData(
           ['solved', params.id], // todo crawling 지우고 캐시 삭제 후 저장하는 형태로하기
           crawlingData,
@@ -140,30 +140,32 @@ const NewdayActivity = (props: IProps) => {
       {!isMutatingCrawling && fetchSolvedCount ? (
         newdayActivity.map((activities: I365DateType[] | null, index) => (
           <tr key={index}>
-            <th className="text-xs w-8 text-left">{daysOfWeek[index]}</th>
-            {activities && activities.map((activity: I365DateType, index) => (
-              <td
-                key={index}
-                data-date={activity?.date}
-                className={`md:w-4 md:h-4 w-3 h-3 ${
-                  activity == null && 'opacity-0'
-                } ${`${
-                  activity?.again
-                    ? activityBgColor['good'][activity.level]
-                    : activityBgColor['bad'][activity?.level || 0]
-                }`} justify-self-center rounded-tl-full rounded-br-full relative after:content-['|'] after:absolute md:after:left-[30%] md:after:rotate-[45deg] md:after:top-[10%] after:left-[29%] after:rotate-[30deg] after:top-[9%] after:font-thin group`}
-              >
-                <span className="hidden rounded-md group-hover:inline-block absolute text-xs z-10 w-max px-2 py-1 origin-center translate-x-[-50%] translate-y-[-130%] ml-2 bg-slate-950 text-white cursor-default before:content-[''] before:w-2 before:h-2 before:bg-slate-950 before:inline-block before:absolute before:top-[100%] before:left-[50%] before:rotate-45 before:origin-center before:translate-x-[-50%] before:translate-y-[-50%] text-center">
-                  You solved {activity?.count} problem on {activity?.date}
-                  <br />
-                  {activity?.count == 0
-                    ? `OMG... You didn't even solve💥`
-                    : activity?.again
-                    ? `Great!😆 You reviewed ${activity.againCount}problem✨`
-                    : `OMG... You didn't review🥲`}
-                </span>
-              </td>
-            ))}
+            <th className="w-8 text-left text-xs">{daysOfWeek[index]}</th>
+            {activities &&
+              activities.map((activity: I365DateType, index) => (
+                <td
+                  key={index}
+                  data-date={activity?.date}
+                  className={`h-3 w-3 md:h-4 md:w-4 ${
+                    activity == null && 'opacity-0'
+                  } ${`${
+                    activity?.again
+                      ? activityBgColor['good'][activity.level]
+                      : activityBgColor['bad'][activity?.level || 0]
+                  }`} group relative justify-self-center rounded-br-full rounded-tl-full after:absolute after:left-[29%] after:top-[9%] after:rotate-[30deg] after:font-thin after:content-['|'] md:after:left-[30%] md:after:top-[10%] md:after:rotate-[45deg]`}
+                >
+                  <span className="absolute z-10 ml-2 hidden w-max origin-center translate-x-[-50%] translate-y-[-130%] cursor-default rounded-md  bg-slate-950 px-2 py-1 text-center text-xs text-white before:absolute before:left-[50%] before:top-[100%] before:inline-block before:h-2 before:w-2 before:origin-center before:translate-x-[-50%] before:translate-y-[-50%] before:rotate-45 before:bg-slate-950 before:content-[''] group-hover:inline-block">
+                    {activity?.date}
+                    <br />
+                    {activity?.count == 0
+                      ? `0 solved.`
+                      : activity?.again
+                        ? `${activity?.count} solved /  
+                        ${activity.againCount} review`
+                        : `${activity?.count} solved / 0 review`}
+                  </span>
+                </td>
+              ))}
           </tr>
         ))
       ) : (

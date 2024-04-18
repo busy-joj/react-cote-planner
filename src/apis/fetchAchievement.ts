@@ -13,17 +13,13 @@ const fetchAchievement = async (
   await defaultInstance
     .get(`achievement?id=${baekjoon_id}`)
     .then((res: AxiosResponse<ICommonResponse<IBaekjoonCrawlingData[]>>) => {
-      const crawlingData: IBaekjoonCrawlingData = res.data.data[0];
-      // return crawlingData;
-      const solvedData = getBaekjoonSolvedData(crawlingData.solved_problem);
+      const solvedData = getBaekjoonSolvedData(res.data.data[0].solved_problem);
       return {
         data: [
           {
-            ...crawlingData,
-            solved_problem: solvedData.solved_problem,
-            review_count: solvedData.review_count,
+            ...res.data.data[0],
+            ...solvedData,
             solved_total_count: solvedData.solved_problem.length,
-            solved_day: solvedData.solved_day,
           },
         ],
       };

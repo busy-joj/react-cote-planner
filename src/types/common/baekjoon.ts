@@ -22,15 +22,16 @@ export interface IBaekjoonCrawlingData {
   solved_count: number;
   solved_recent: string;
   updated_at: Date;
-  today: Date;
 }
 
 export interface ICustomBaekjoonCrawlingData {
   solved_problem: ICustomSolvedProblem[];
+  solved_list: {
+    [key: string]: ICustomSolvedProblem[];
+  };
   solved_count: number;
   solved_recent: string;
   updated_at: Date;
-  today: Date;
   review_count: number;
   solved_total_count: number;
   solved_day: number;

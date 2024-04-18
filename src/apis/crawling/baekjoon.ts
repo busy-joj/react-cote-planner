@@ -2,6 +2,16 @@ import { compareAsc, differenceInDays, formatISO } from 'date-fns';
 import { getAllActivities, getLevel } from '@/utils/contribution';
 import { ISolvedProblem, ICustomSolvedProblem } from '@/types/common/baekjoon';
 import { I365DateType } from '@/types/contribution';
+
+interface IGetBaekjoonSolvedData {
+  solved_problem: ICustomSolvedProblem[];
+  review_count: number;
+  solved_day: number;
+  solved_list: {
+    [key: string]: ICustomSolvedProblem[];
+  };
+}
+
 /**
  * 같은 언어와 같은 문제 번호일 때, 문제를 푼 시간이 여러개일 경우
  * solvedTime으로 모아주는 역할
@@ -12,7 +22,9 @@ import { I365DateType } from '@/types/contribution';
  *  solved_day: 1년동안 코테 문제 푼 일수,
  * }
  */
-export const getBaekjoonSolvedData = (data: ISolvedProblem[]) => {
+export const getBaekjoonSolvedData = (
+  data: ISolvedProblem[],
+): IGetBaekjoonSolvedData => {
   let reviewCount = 0;
   const solvedDays = new Set();
   const newData: ICustomSolvedProblem[] = data.reduce(
@@ -45,13 +57,31 @@ export const getBaekjoonSolvedData = (data: ISolvedProblem[]) => {
     [],
   );
   const solvedProblem: ICustomSolvedProblem[] = Object.values(newData);
-  const { solved_day } = checkSolvedTime(getAllActivities(), solvedProblem);
+  const { solved_day, solved_list } = checkSolvedTime(
+    getAllActivities(),
+    solvedProblem,
+  );
   return {
     solved_problem: solvedProblem,
     review_count: reviewCount,
     solved_day: solved_day,
+    solved_list: solved_list,
   };
 };
+
+// interface Solved {
+//   problemNum : string
+//   language: string
+//   problemLink: string
+// }
+
+interface ICheckSolvedTime {
+  dataActivities: I365DateType[];
+  solved_day: number;
+  solved_list: {
+    [key: string]: ICustomSolvedProblem[];
+  };
+}
 
 /**
  * 365일을 solvedTime의 값과 비교하여 문제를 푼 날이면 가중치를 더해주고
@@ -66,12 +96,14 @@ export const getBaekjoonSolvedData = (data: ISolvedProblem[]) => {
 export const checkSolvedTime = (
   oneYearFromNowArr: I365DateType[],
   fetchSolvedProblem: ICustomSolvedProblem[],
-) => {
+): ICheckSolvedTime => {
   const solvedDays = new Set<string>();
+  const solvedList = new Map<string, ICustomSolvedProblem[]>();
   if (!Array.isArray(oneYearFromNowArr) || !Array.isArray(fetchSolvedProblem)) {
     return {
       dataActivities: oneYearFromNowArr,
       solved_day: solvedDays.size,
+      solved_list: Object.fromEntries(solvedList),
     }; // 유효하지 않은 경우, 원래 배열 반환
   }
   const oneYearFromNowArrLen = oneYearFromNowArr.length;
@@ -98,7 +130,11 @@ export const checkSolvedTime = (
             solvedTime,
           );
           solvedDays.add(solvedTime);
-
+          if (!solvedList.get(solvedTime)) {
+            solvedList.set(solvedTime, [fetchSolvedProblem[k]]);
+          } else {
+            solvedList.get(solvedTime)?.push(fetchSolvedProblem[k]);
+          }
           currentDate.overdue = daysSinceProblemSolved;
           if (solvedTimeArray.length > 1) {
             currentDate.againCount++;
@@ -114,5 +150,6 @@ export const checkSolvedTime = (
   return {
     dataActivities: oneYearFromNowArr,
     solved_day: solvedDays.size,
+    solved_list: Object.fromEntries(solvedList),
   };
 };

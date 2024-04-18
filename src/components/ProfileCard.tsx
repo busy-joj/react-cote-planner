@@ -74,17 +74,7 @@ const ProfileCard = () => {
                     );
                     await supabaseClient
                       .from('baekjoon')
-                      .update([
-                        {
-                          solved_problem: crawlingData.solved_problem,
-                          solved_count: crawlingData.solved_count,
-                          solved_recent: crawlingData.solved_recent,
-                          solved_total_count: crawlingData.solved_total_count,
-                          solved_day: crawlingData.solved_day,
-                          review_count: crawlingData.review_count,
-                          updated_at: crawlingData.updated_at,
-                        },
-                      ])
+                      .update([crawlingData])
                       .eq('id', params.id);
                   },
                 })
