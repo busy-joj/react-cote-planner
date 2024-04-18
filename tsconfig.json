@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "outDir": "dist",
     "target": "ESNext",
     "useDefineForClassFields": true,
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
@@ -27,7 +28,7 @@
       "@components/*": ["src/components/*"]
     }
   },
-  "include": ["src", "**/*.ts", "**/*.tsx", "vite.config.ts"],
-  "exclude": ["node_modules"],
+  "include": ["src", "**/*.ts", "**/*.tsx"],
+  "exclude": ["node_modules", "tests", "mocks"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
