@@ -24,11 +24,6 @@ export default ({ mode }: { mode: string }) => {
           }) as PluginOption)
         : [],
     ],
-    test: {
-      globals: true,
-      environment: 'jsdom',
-      setupFiles: './src/test/setup.ts',
-    },
     resolve: {
       alias: [
         { find: '@', replacement: path.resolve(__dirname, './src') },
@@ -37,6 +32,28 @@ export default ({ mode }: { mode: string }) => {
           replacement: path.resolve(__dirname, './src/components'),
         },
       ],
+    },
+    build: {
+      outDir: 'dist', // 빌드 결과물 출력 디렉터리
+      emptyOutDir: true, // 빌드 전 outDir 디렉터리 비우기
+      rollupOptions: {
+        input: {
+          main: '/src/main.tsx', // 엔트리 파일 지정
+        },
+        // 제외할 디렉터리 및 파일 패턴 설정
+        external: [
+          '/tests/',
+          '/tests/**/*',
+          '/mocks/',
+          '/mocks/**/*',
+          '/node_modules/**/*',
+        ],
+      },
+    },
+    test: {
+      globals: true,
+      environment: 'jsdom',
+      setupFiles: './tests/setup.ts',
     },
   });
 };
