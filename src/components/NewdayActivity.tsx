@@ -2,7 +2,6 @@ import {
   useIsMutating,
   useMutation,
   useQueryClient,
-  useSuspenseQuery,
 } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 
@@ -15,9 +14,9 @@ import { supabaseClient } from '../supabase/client';
 import { isOneDayPassed } from '../utils/contribution';
 import { I365DateType } from '@/types/contribution';
 import { IBaekjoonTable } from '@/types/common/supabase';
-import { PostgrestMaybeSingleResponse } from '@supabase/supabase-js';
 import { ResponseData } from '@/types/common/response';
 import { ICustomBaekjoonCrawlingData } from '@/types/common/baekjoon';
+import useSolvedSuspenseQuery from '@/hooks/reactQuery/queries/useSolvedSuspenseQuery';
 
 const ActivityLoading = () => {
   return (
@@ -80,12 +79,8 @@ const NewdayActivity = (props: IProps) => {
   const isMutatingCrawling = useIsMutating({
     mutationKey: ['update', 'crawling', params.id],
   });
-  const { data: baekjoonData } = useSuspenseQuery({
-    queryKey: ['solved', params.id],
-    queryFn: async (): Promise<
-      PostgrestMaybeSingleResponse<IBaekjoonTable[]>
-    > => await supabaseClient.from('baekjoon').select('*').eq('id', params.id),
-  });
+
+  const { data: baekjoonData } = useSolvedSuspenseQuery(params.id);
   const data = baekjoonData.data?.[0] as IBaekjoonTable;
   const fetchSolvedProblem = data?.solved_problem;
   const fetchSolvedCount = data?.solved_count;

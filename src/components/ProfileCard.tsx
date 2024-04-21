@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
 
@@ -14,7 +14,7 @@ import DonutChart from './DonutChart';
 import { IBaekjoonTable } from '@/types/common/supabase';
 import { ResponseData } from '@/types/common/response';
 import { ICustomBaekjoonCrawlingData } from '@/types/common/baekjoon';
-import { PostgrestMaybeSingleResponse } from '@supabase/supabase-js';
+import useSolvedQuery from '@/hooks/reactQuery/queries/useSolvedQuery';
 
 const ProfileCard = () => {
   const { userInfo } = userStore();
@@ -28,13 +28,7 @@ const ProfileCard = () => {
       await fetchAchievement(baekjoonId),
     mutationKey: ['update', 'crawling', params.id],
   });
-  const { data: baekjoonData } = useQuery({
-    queryKey: ['solved', params.id],
-    queryFn: async (): Promise<
-      PostgrestMaybeSingleResponse<IBaekjoonTable[]>
-    > => await supabaseClient.from('baekjoon').select('*').eq('id', params.id),
-    enabled: false,
-  });
+  const { data: baekjoonData } = useSolvedQuery(params.id);
   const data = baekjoonData?.data?.[0] as IBaekjoonTable;
   const updated_at = data?.updated_at;
   const solved_day = data?.solved_day;
