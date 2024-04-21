@@ -3,7 +3,12 @@ import { useState, useEffect, useMemo } from 'react';
 const PROGRESS_UNIT = 0.01;
 const PROGRESS_TIMEOUT = 5;
 
-const getArcPath = (start: number, end: number, innerRadius: number, outerRadius: number) => {
+const getArcPath = (
+  start: number,
+  end: number,
+  innerRadius: number,
+  outerRadius: number,
+) => {
   const startAngle = start * Math.PI * 2;
   const endAngle = end * Math.PI * 2;
   const x1 = innerRadius * Math.sin(startAngle);
@@ -22,14 +27,20 @@ const getArcPath = (start: number, end: number, innerRadius: number, outerRadius
 };
 
 interface IDonutChart {
-  width: number
-  height: number
-  value:number
-  innerRadius: number
-  outerRadius: number
+  width: number;
+  height: number;
+  value: number;
+  innerRadius: number;
+  outerRadius: number;
 }
 
-const DonutChart = ({ width, height, value, innerRadius, outerRadius }: IDonutChart) => {
+const DonutChart = ({
+  width,
+  height,
+  value,
+  innerRadius,
+  outerRadius,
+}: IDonutChart) => {
   const [visiblePart, setVisiblePart] = useState(0);
   const items = useMemo(
     () => [
@@ -38,7 +49,6 @@ const DonutChart = ({ width, height, value, innerRadius, outerRadius }: IDonutCh
     ],
     [value],
   );
-
   useEffect(() => {
     if (visiblePart < 1) {
       setTimeout(
@@ -73,7 +83,7 @@ const DonutChart = ({ width, height, value, innerRadius, outerRadius }: IDonutCh
           ))}
         </g>
       </svg>
-      <p className="absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2">
+      <p className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
         {value}%
       </p>
     </div>
