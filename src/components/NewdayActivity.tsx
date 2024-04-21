@@ -1,8 +1,4 @@
-import {
-  useIsMutating,
-  useMutation,
-  useQueryClient,
-} from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 
 import { checkSolvedTime } from '@/apis/crawling/baekjoon';
@@ -10,13 +6,14 @@ import fetchAchievement from '@/apis/fetchAchievement';
 import Skeleton from '@/components/Skeleton';
 import { groupByDays } from '@/utils/contribution';
 
-import { supabaseClient } from '../supabase/client';
 import { isOneDayPassed } from '../utils/contribution';
 import { I365DateType } from '@/types/contribution';
 import { IBaekjoonTable } from '@/types/common/supabase';
 import { ResponseData } from '@/types/common/response';
 import { ICustomBaekjoonCrawlingData } from '@/types/common/baekjoon';
 import useSolvedSuspenseQuery from '@/hooks/reactQuery/queries/useSolvedSuspenseQuery';
+import useUpdateSolvedMutation from '@/hooks/reactQuery/mutations/useUpdateSolvedMutation';
+import useIsUpdateSolvedMutation from '@/hooks/reactQuery/mutations/useIsUpdateSolvedMutation';
 
 const ActivityLoading = () => {
   return (
@@ -70,16 +67,8 @@ const NewdayActivity = (props: IProps) => {
   >([]);
   const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   const queryClient = useQueryClient();
-  const { mutate } = useMutation({
-    mutationFn: async (
-      baekjoonId: string,
-    ): Promise<ResponseData<ICustomBaekjoonCrawlingData[]>> =>
-      await fetchAchievement(baekjoonId),
-  });
-  const isMutatingCrawling = useIsMutating({
-    mutationKey: ['update', 'crawling', params.id],
-  });
-
+  const { mutate } = useUpdateSolvedMutation(params.id);
+  const isMutatingCrawling = useIsUpdateSolvedMutation(params.id);
   const { data: baekjoonData } = useSolvedSuspenseQuery(params.id);
   const data = baekjoonData.data?.[0] as IBaekjoonTable;
   const fetchSolvedProblem = data?.solved_problem;
@@ -88,34 +77,17 @@ const NewdayActivity = (props: IProps) => {
   useEffect(() => {
     // 하루 이상 지나면 데이터 업데이트
     if (data?.updated_at && isOneDayPassed(data?.updated_at)) {
-      console.log('여기인가');
       const updateOneDayPassed = async () => {
-        mutate(params.id, {
-          onSuccess: async (
-            res: ResponseData<ICustomBaekjoonCrawlingData[]>,
-          ) => {
-            const crawlingData: ICustomBaekjoonCrawlingData = res.data[0];
-            queryClient.setQueryData(['solved', params.id], crawlingData);
-            await supabaseClient
-              .from('baekjoon')
-              .update([crawlingData])
-              .eq('id', params.id);
-            // 하루 지난 데이터가 캐싱되어 있는 상태에서 새로운 데이터를 가져온 후
-            // setQueryData를 통해 업데이트해줬지만 화면에서는 동기화가 이루어지지 않음
-            // invalidateQueries를 통해 해당 queryKey 중 활성화(현재 페이지에서 사용중인 데이터) 된 애들만 강제 동기화
-            // (invalidateQueries는 캐싱중이며 활성화 되어있는 query들을 무효화하고 다시 요청)
-            await queryClient.invalidateQueries({
-              queryKey: ['solved', params.id],
-              refetchType: 'active',
-            });
-          },
-        });
+        mutate(params.id);
       };
       updateOneDayPassed();
     } else if (!fetchSolvedProblem) {
       const getNewData = async () => {
         const crawlingData: ResponseData<ICustomBaekjoonCrawlingData[]> =
-          await fetchAchievement(params.id);
+          await queryClient.fetchQuery({
+            queryKey: ['solved', 'new', params.id],
+            queryFn: async () => await fetchAchievement(params.id),
+          });
         queryClient.setQueryData(
           ['solved', params.id], // todo crawling 지우고 캐시 삭제 후 저장하는 형태로하기
           crawlingData,

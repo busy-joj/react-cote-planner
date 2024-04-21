@@ -1,33 +1,22 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
 
-import fetchAchievement from '@/apis/fetchAchievement';
 import DefaultUser from '@/assets/defaultUser.svg?react';
 import Refresh from '@/assets/refresh.svg?react';
 import { LoadingButton } from '@/components/common/Button';
 import { fromNow } from '@/utils/contribution';
 
 import { userStore } from '../store';
-import { supabaseClient } from '../supabase/client';
 import DonutChart from './DonutChart';
 import { IBaekjoonTable } from '@/types/common/supabase';
-import { ResponseData } from '@/types/common/response';
-import { ICustomBaekjoonCrawlingData } from '@/types/common/baekjoon';
 import useSolvedQuery from '@/hooks/reactQuery/queries/useSolvedQuery';
+import useUpdateSolvedMutation from '@/hooks/reactQuery/mutations/useUpdateSolvedMutation';
 
 const ProfileCard = () => {
   const { userInfo } = userStore();
   const params = useParams() as { id: string };
 
-  const queryClient = useQueryClient();
-  const { mutate, isPending } = useMutation({
-    mutationFn: async (
-      baekjoonId: string,
-    ): Promise<ResponseData<ICustomBaekjoonCrawlingData[]>> =>
-      await fetchAchievement(baekjoonId),
-    mutationKey: ['update', 'crawling', params.id],
-  });
+  const { mutate, isPending } = useUpdateSolvedMutation(params.id);
   const { data: baekjoonData } = useSolvedQuery(params.id);
   const data = baekjoonData?.data?.[0] as IBaekjoonTable;
   const updated_at = data?.updated_at;
@@ -58,21 +47,7 @@ const ProfileCard = () => {
           <div className="mb-4 flex items-center gap-2">
             <LoadingButton
               isPending={isPending || !updated_at}
-              onClick={() =>
-                mutate(params.id, {
-                  onSuccess: async res => {
-                    const crawlingData = res.data[0];
-                    queryClient.setQueryData(
-                      ['solved', params.id],
-                      crawlingData,
-                    );
-                    await supabaseClient
-                      .from('baekjoon')
-                      .update([crawlingData])
-                      .eq('id', params.id);
-                  },
-                })
-              }
+              onClick={() => mutate(params.id)}
               className={`h-6 w-8 bg-primary-600 py-1 text-white lg:h-8 lg:w-10 lg:py-2`}
             >
               <Refresh />
@@ -96,22 +71,29 @@ const ProfileCard = () => {
       <article className="col-start-1 col-end-2 flex flex-col rounded-lg bg-profileCard-study p-3 font-bold text-white lg:col-start-2 lg:col-end-3 lg:rounded-xl lg:p-8">
         <p className="text-base lg:text-lg">학습일</p>
         <div className="flex h-full items-center justify-center text-lg lg:text-3xl">
-          {solved_day || '-'}일 / 365일
+          {((isPending || !updated_at) && '-') || solved_day || '-'}일 / 365일
         </div>
       </article>
       <article className="col-start-2 col-end-3 flex flex-col rounded-lg bg-profileCard-review p-3 font-bold text-white lg:col-start-3 lg:col-end-4 lg:rounded-xl lg:p-8">
         <p className="text-base lg:text-lg">복습력</p>
         <div className="flex h-full flex-col items-center justify-around gap-1 md:flex-row">
-          <DonutChart
-            width={100}
-            height={100}
-            value={review_ratio || 0}
-            innerRadius={40}
-            outerRadius={49}
-          />
+          {isPending || !updated_at ? null : (
+            <DonutChart
+              width={100}
+              height={100}
+              value={review_ratio || 0}
+              innerRadius={40}
+              outerRadius={49}
+            />
+          )}
           <ul className="list-disc text-sm lg:text-base">
-            <li>문제 해결 {solved_total_count}문제</li>
-            <li>복습 {review_count}문제</li>
+            <li>
+              문제 해결{' '}
+              {((isPending || !updated_at) && '-') || solved_total_count}문제
+            </li>
+            <li>
+              복습 {((isPending || !updated_at) && '-') || review_count}문제
+            </li>
           </ul>
         </div>
       </article>
