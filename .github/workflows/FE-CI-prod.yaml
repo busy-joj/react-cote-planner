@@ -20,7 +20,7 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      - name: Cache dependencies
+      - name: Cache Node modules
         id: cache
         uses: actions/cache@v3
         with:
@@ -60,10 +60,21 @@ jobs:
           node-version: ${{ matrix.node-version }}
 
       - name: Cache Node modules
+        id: cache
         uses: actions/cache@v3
         with:
           path: '**/node_modules'
           key: ${{ runner.os }}-node-${{ matrix.node-version }}-${{ hashFiles('**/package-lock.json') }}
+
+      - name: Install Dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: npm ci
+
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: build-output
+          path: build
 
       - name: Run test
         env:
@@ -73,6 +84,3 @@ jobs:
           VITE_KAKAO_JS_SDK_KEY: ${{ secrets.VITE_KAKAO_JS_SDK_KEY }}
           VITE_GOOGLE_ID: ${{ secrets.VITE_GOOGLE_ID }}
         run: npm run test
-      - uses: actions/download-artifact@v4
-        with:
-          name: build-output
