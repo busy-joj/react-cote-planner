@@ -32,6 +32,12 @@ jobs:
         run: npm ci
 
       - name: Run build
+        env:
+          VITE_SERVER_URL: ${{ secrets.VITE_SERVER_URL }}
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+          VITE_KAKAO_JS_SDK_KEY: ${{ secrets.VITE_KAKAO_JS_SDK_KEY }}
+          VITE_GOOGLE_ID: ${{ secrets.VITE_GOOGLE_ID }}
         run: npm run build
       - uses: actions/upload-artifact@v4
         with:
@@ -60,6 +66,12 @@ jobs:
           key: ${{ runner.os }}-node-${{ matrix.node-version }}-${{ hashFiles('**/package-lock.json') }}
 
       - name: Run test
+        env:
+          VITE_SERVER_URL: ${{ secrets.VITE_SERVER_URL }}
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+          VITE_KAKAO_JS_SDK_KEY: ${{ secrets.VITE_KAKAO_JS_SDK_KEY }}
+          VITE_GOOGLE_ID: ${{ secrets.VITE_GOOGLE_ID }}
         run: npm run test
       - uses: actions/download-artifact@v4
         with:
