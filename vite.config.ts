@@ -27,6 +27,8 @@ export default ({ mode }: { mode: string }) => {
     resolve: {
       alias: [
         { find: '@', replacement: path.resolve(__dirname, './src') },
+        { find: '@mocks', replacement: path.resolve(__dirname, './mocks') },
+        { find: '@tests', replacement: path.resolve(__dirname, './tests') },
         {
           find: '@components',
           replacement: path.resolve(__dirname, './src/components'),

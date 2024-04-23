@@ -8,10 +8,10 @@ import { expect, beforeAll, afterEach, afterAll } from 'vitest';
 import { cleanup } from '@testing-library/react';
 
 // Jest-DOM 매처를 임포트
-import matchers from '@testing-library/jest-dom/matchers';
+import * as matchers from '@testing-library/jest-dom/matchers';
 
 // 모의(mock) API 서버를 임포트
-import { server } from '../mocks/node';
+import { server } from '@mocks/node';
 
 // react-testing-library의 matcher를 확장한다.
 // `@testing-library/jest-dom`의 matcher를 사용할 수 있게 된다.
