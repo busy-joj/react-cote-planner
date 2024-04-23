@@ -25,10 +25,12 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"],
-      "@components/*": ["src/components/*"]
+      "@components/*": ["src/components/*"],
+      "@tests/*": ["tests/*"],
+      "@mocks/*": ["mocks/*"]
     }
   },
-  "include": ["src", "**/*.ts", "**/*.tsx"],
-  "exclude": ["node_modules", "tests", "mocks"],
+  "include": ["src", "**/*.ts", "**/*.tsx", "tests", "mocks"],
+  "exclude": ["node_modules"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

@@ -1,7 +1,7 @@
 import { http, HttpResponse } from 'msw';
 import { BASE_URL } from '@/apis';
-import success_data from '../data/achievement/success.json';
-import empty_data from '../data/achievement/empty.json';
+import success_data from '@mocks/data/achievement/success.json';
+import empty_data from '@mocks/data/achievement/empty.json';
 
 export const achievementHandlers = [
   http.get(`${BASE_URL}achievement`, ({ request }) => {
