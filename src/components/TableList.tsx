@@ -1,7 +1,5 @@
-import { supabaseClient } from '@/supabase/client';
+import useSolvedSuspenseQuery from '@/hooks/reactQuery/queries/useSolvedSuspenseQuery';
 import { IBaekjoonTable } from '@/types/common/supabase';
-import { PostgrestMaybeSingleResponse } from '@supabase/postgrest-js';
-import { useSuspenseQuery } from '@tanstack/react-query';
 import { useSearchParams } from 'react-router-dom';
 
 interface IProps {
@@ -9,12 +7,7 @@ interface IProps {
 }
 const TableList = (props: IProps) => {
   const { id } = props;
-  const { data: baekjoonData } = useSuspenseQuery({
-    queryKey: ['solved', id],
-    queryFn: async (): Promise<
-      PostgrestMaybeSingleResponse<IBaekjoonTable[]>
-    > => await supabaseClient.from('baekjoon').select('*').eq('id', id),
-  });
+  const { data: baekjoonData } = useSolvedSuspenseQuery(id);
   const [searchParams] = useSearchParams();
   const data = baekjoonData.data?.[0] as IBaekjoonTable;
   const solvedList = data?.solved_list;
