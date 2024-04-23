@@ -1,19 +1,10 @@
-import { useQueryClient } from '@tanstack/react-query';
-import { useEffect, useState } from 'react';
-
-import { checkSolvedTime } from '@/apis/crawling/baekjoon';
-import fetchAchievement from '@/apis/fetchAchievement';
 import Skeleton from '@/components/Skeleton';
-import { groupByDays } from '@/utils/contribution';
 
-import { isOneDayPassed } from '../utils/contribution';
 import { I365DateType } from '@/types/contribution';
 import { IBaekjoonTable } from '@/types/common/supabase';
-import { ResponseData } from '@/types/common/response';
-import { ICustomBaekjoonCrawlingData } from '@/types/common/baekjoon';
 import useSolvedSuspenseQuery from '@/hooks/reactQuery/queries/useSolvedSuspenseQuery';
-import useUpdateSolvedMutation from '@/hooks/reactQuery/mutations/useUpdateSolvedMutation';
 import useIsUpdateSolvedMutation from '@/hooks/reactQuery/mutations/useIsUpdateSolvedMutation';
+import useUpdateOneDayPassed from '@/hooks/reactQuery/queryClient/useUpdateOneDayPassed';
 
 const ActivityLoading = () => {
   return (
@@ -54,54 +45,20 @@ const activityBgColor: IActivityBgColor = {
 };
 
 interface IProps {
-  allActivities: I365DateType[];
   params: {
     id: string;
   };
 }
 
 const NewdayActivity = (props: IProps) => {
-  const { allActivities, params } = props;
-  const [newdayActivity, setnewdayActivity] = useState<
-    (I365DateType[] | null)[]
-  >([]);
+  const { params } = props;
   const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-  const queryClient = useQueryClient();
-  const { mutate } = useUpdateSolvedMutation(params.id);
   const isMutatingCrawling = useIsUpdateSolvedMutation(params.id);
   const { data: baekjoonData } = useSolvedSuspenseQuery(params.id);
   const data = baekjoonData.data?.[0] as IBaekjoonTable;
-  const fetchSolvedProblem = data?.solved_problem;
   const fetchSolvedCount = data?.solved_count;
+  const newdayActivity = useUpdateOneDayPassed(params.id);
 
-  useEffect(() => {
-    // 하루 이상 지나면 데이터 업데이트
-    if (data?.updated_at && isOneDayPassed(data?.updated_at)) {
-      const updateOneDayPassed = async () => {
-        mutate(params.id);
-      };
-      updateOneDayPassed();
-    } else if (!fetchSolvedProblem) {
-      const getNewData = async () => {
-        const crawlingData: ResponseData<ICustomBaekjoonCrawlingData[]> =
-          await queryClient.fetchQuery({
-            queryKey: ['solved', 'new', params.id],
-            queryFn: async () => await fetchAchievement(params.id),
-          });
-        queryClient.setQueryData(
-          ['solved', params.id], // todo crawling 지우고 캐시 삭제 후 저장하는 형태로하기
-          crawlingData,
-        );
-      };
-      getNewData();
-    }
-    const { dataActivities } = checkSolvedTime(
-      allActivities,
-      fetchSolvedProblem,
-    );
-    setnewdayActivity(groupByDays(dataActivities));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fetchSolvedProblem, allActivities]);
   return (
     <>
       {!isMutatingCrawling && fetchSolvedCount ? (

@@ -91,7 +91,7 @@ const Contribution = ({ params }: IProps) => {
             }}
           >
             <Suspense fallback={<ActivityLoading />}>
-              <NewdayActivity allActivities={allActivities} params={params} />
+              <NewdayActivity params={params} />
             </Suspense>
           </tbody>
         </table>
