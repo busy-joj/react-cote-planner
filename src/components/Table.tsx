@@ -1,6 +1,8 @@
 import { Suspense } from 'react';
 import Skeleton from '@/components/Skeleton';
 import TableList from '@/components/TableList';
+import { useIsFetching } from '@tanstack/react-query';
+import useIsUpdateSolvedMutation from '@/hooks/reactQuery/mutations/useIsUpdateSolvedMutation';
 
 const TableLoading = () => {
   return (
@@ -29,7 +31,10 @@ interface IProps {
 
 const Table = (props: IProps) => {
   const { params } = props;
-
+  const isMutatingCrawling = useIsUpdateSolvedMutation(params.id);
+  const isFetchingNewSolved = useIsFetching({
+    queryKey: ['solved', 'new', params.id],
+  });
   return (
     <>
       {' '}
@@ -56,7 +61,11 @@ const Table = (props: IProps) => {
           </thead>
           <tbody>
             <Suspense fallback={<TableLoading />}>
-              <TableList id={params.id} />
+              {!isFetchingNewSolved && !isMutatingCrawling ? (
+                <TableList id={params.id} />
+              ) : (
+                <TableLoading />
+              )}
             </Suspense>
           </tbody>
         </table>
