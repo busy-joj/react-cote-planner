@@ -2,11 +2,10 @@ name: CI - Development
 run-name: ${{ github.actor }} (${{ github.actor_id }})
 on:
   pull_request:
-    branches:
-      - '*'
-  push:
     branches-ignore:
       - main
+  push:
+    branches-ignore: [main, develop]
 
 jobs:
   build:
