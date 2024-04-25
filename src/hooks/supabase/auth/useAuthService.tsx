@@ -1,19 +1,46 @@
 import { SupabaseAuthClient } from '@supabase/supabase-js/dist/module/lib/SupabaseAuthClient';
-import { supabaseClient } from '../../../supabase/client';
-import { IFormValues } from '@/types/form/login';
+import { supabaseClient } from '@/supabase/client';
+import {
+  ILoginFormValues,
+  ISignUpDependencies,
+  ISignUpFormValues,
+} from '@/types/form/auth';
 
 export const useAuthService = () => {
   const authService: SupabaseAuthClient = supabaseClient.auth;
+  const signUp =
+    (dependencies: ISignUpDependencies) =>
+    async (inputData: ISignUpFormValues) => {
+      const { email, pw, username, baekjoonID } = inputData;
+      dependencies.setIsLoadingSignup(true);
+      try {
+        const { error } = await supabaseClient.auth.signUp({
+          email,
+          password: pw,
+          options: {
+            data: {
+              user_name: username,
+              avatar_url: null,
+              baekjoon_id: baekjoonID,
+            },
+          },
+        });
 
-  const signUp = async () => {
-    // 로직 구현
-  };
+        if (error) {
+          console.error(error);
+        } else {
+          dependencies.navigate('/signup/confirm');
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
 
   const signOut = async () => {
     // 로직 구현
   };
 
-  const signInWithPassword = async (data: IFormValues) => {
+  const signInWithPassword = async (data: ILoginFormValues) => {
     const { userEmail, userPW } = data;
     return await authService.signInWithPassword({
       email: userEmail,
