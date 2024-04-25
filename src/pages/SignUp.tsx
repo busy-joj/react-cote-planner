@@ -11,27 +11,19 @@ import Button, { SubmitButton } from '@/components/common/Button';
 import Input, { LabelInput, Label } from '@/components/common/Input';
 import { useQueryClient } from '@tanstack/react-query';
 import fetchUserCheck from '@/apis/fetchUserCheck';
-
-interface IBaekjoonValidation {
-  isLoading: boolean;
-  checked: boolean;
-  text: string;
-}
-
-interface IFormValues {
-  email: string;
-  username: string;
-  baekjoonID: string;
-  pw: string;
-  confirmPw: string;
-}
+import {
+  ISignUpBaekjoonValidation,
+  ISignUpFormValues,
+} from '@/types/form/auth';
+import { useAuthService } from '@/hooks/supabase/auth/useAuthService';
 
 const SignUpPage = () => {
   const navigate = useNavigate();
   const checkChangeRef = useRef<string | null>(null);
+  const { signUp } = useAuthService();
   const [isLoadingSignup, setIsLoadingSignup] = useState<boolean>(false);
   const [baekjoonValidation, setBaekjoonValidation] =
-    useState<IBaekjoonValidation>({
+    useState<ISignUpBaekjoonValidation>({
       isLoading: false,
       checked: false,
       text: '인증',
@@ -41,13 +33,13 @@ const SignUpPage = () => {
 
   const {
     register,
-    formState: { errors },
+    formState: { errors, dirtyFields },
     getValues,
     setFocus,
     setError,
     handleSubmit,
-  } = useForm<IFormValues>({ mode: 'onChange' });
-  const onSubmit: SubmitHandler<IFormValues> = data => {
+  } = useForm<ISignUpFormValues>({ mode: 'onChange' });
+  const onSubmit: SubmitHandler<ISignUpFormValues> = data => {
     // 백준ID 인증 안했을 경우
     if (!baekjoonValidation.checked) {
       setFocus('baekjoonID');
@@ -102,30 +94,12 @@ const SignUpPage = () => {
     }
   };
 
-  const HandleSignUp = async (inputData: IFormValues) => {
-    const { email, pw, username, baekjoonID } = inputData;
-    setIsLoadingSignup(true);
-    try {
-      const { error } = await supabaseClient.auth.signUp({
-        email: email,
-        password: pw,
-        options: {
-          data: {
-            user_name: username,
-            avatar_url: null,
-            baekjoon_id: baekjoonID,
-          },
-        },
-      });
-      if (error) {
-        console.error(error);
-      } else {
-        navigate('/signup/confirm');
-      }
-    } catch (error) {
-      console.error(error);
-    }
+  const HandleSignUp = async (inputData: ISignUpFormValues) => {
+    const handleAuthSignUp = signUp({ setIsLoadingSignup, navigate });
+    handleAuthSignUp(inputData);
   };
+  console.log(errors);
+  console.log(dirtyFields);
   return (
     <SignLayout>
       <form
@@ -235,7 +209,7 @@ const SignUpPage = () => {
                 },
               },
             })}
-            name="password"
+            name="pw"
           >
             비밀번호
           </LabelInput>
@@ -257,7 +231,7 @@ const SignUpPage = () => {
                 },
               },
             })}
-            name="confirm-password"
+            name="confirmPw"
           >
             비밀번호 확인
           </LabelInput>
