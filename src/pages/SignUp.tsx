@@ -33,7 +33,7 @@ const SignUpPage = () => {
 
   const {
     register,
-    formState: { errors, dirtyFields },
+    formState: { errors },
     getValues,
     setFocus,
     setError,
@@ -98,8 +98,7 @@ const SignUpPage = () => {
     const handleAuthSignUp = signUp({ setIsLoadingSignup, navigate });
     handleAuthSignUp(inputData);
   };
-  console.log(errors);
-  console.log(dirtyFields);
+
   return (
     <SignLayout>
       <form
