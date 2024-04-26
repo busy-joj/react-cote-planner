@@ -8,13 +8,14 @@ import {
 
 export const useAuthService = () => {
   const authService: SupabaseAuthClient = supabaseClient.auth;
+
   const signUp =
     (dependencies: ISignUpDependencies) =>
     async (inputData: ISignUpFormValues) => {
       const { email, pw, username, baekjoonID } = inputData;
       dependencies.setIsLoadingSignup(true);
       try {
-        const { error } = await supabaseClient.auth.signUp({
+        const { error } = await authService.signUp({
           email,
           password: pw,
           options: {
